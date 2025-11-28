@@ -51,7 +51,7 @@
       max-width: 520px;
     }
 
-    /* --- Slider card rechts --- */
+    /* --- Slider rechts --- */
 
     .hero-slider {
       position: relative;
@@ -63,37 +63,54 @@
     .slider-card {
       background: #ffffff;
       border-radius: 24px;
-      padding: 32px 32px 40px;
+      padding: 32px 32px 64px; /* extra onderruimte voor 'Bekijk case' */
       box-shadow: 0 18px 45px rgba(9, 23, 71, 0.11);
-      min-height: 420px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 440px;
       position: relative;
-      overflow: visible;
+      overflow: visible; /* zodat beeld boven/onder mag uitsteken */
+    }
+
+    .slider-viewport {
+      position: relative;
+      overflow-x: hidden;   /* we snijden links/rechts af voor het slide-effect */
+      overflow-y: visible;  /* maar boven/onder mag uitsteken */
+      height: 320px;        /* vaste hoogte → alle slides zelfde formaat */
     }
 
     .slider-slide {
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate3d(40px, -50%, 0); /* start iets rechts */
+      opacity: 0;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      pointer-events: none;
     }
 
     .slider-slide.active {
-      display: flex;
+      transform: translate3d(0, -50%, 0); /* in het midden */
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* actieve slide die weggaat → schuift naar links + fade out */
+    .slider-slide.active.animating-out {
+      transform: translate3d(-40px, -50%, 0);
+      opacity: 0;
     }
 
     .slider-slide img {
       display: block;
-      max-width: 100%;
-      height: auto;
+      height: 120%;   /* groter dan viewport */
+      width: auto;
+      max-width: none;
     }
 
-    /* "Bekijk case" knop rechtsboven in de card */
+    /* 'Bekijk case' rechts-onder in de kaart */
     .case-link {
       position: absolute;
-      top: 18px;
       right: 26px;
+      bottom: 20px;
       padding: 10px 18px;
       border-radius: 999px;
       border: 1px solid rgba(21, 42, 82, 0.25);
@@ -111,7 +128,7 @@
       transform: translateY(1px);
     }
 
-    /* --- Loader / controls onder de card --- */
+    /* --- Loader / controls onder de kaart --- */
 
     .slider-controls {
       margin-top: 24px;
@@ -131,44 +148,7 @@
       justify-content: center;
       cursor: pointer;
       padding: 0;
-    }
-
-    .slider-playpause-icon {
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 8px 0 8px 12px; /* driehoek */
-      border-color: transparent transparent transparent var(--brand-blue);
-      margin-left: 2px;
-    }
-
-    .slider-playpause.paused .slider-playpause-icon {
-      /* pauze-icoon */
-      width: 12px;
-      height: 12px;
-      border: none;
-      background: none;
-      position: relative;
-      margin-left: 0;
-    }
-
-    .slider-playpause.paused .slider-playpause-icon::before,
-    .slider-playpause.paused .slider-playpause-icon::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--brand-blue);
-      border-radius: 999px;
-    }
-
-    .slider-playpause.paused .slider-playpause-icon::before {
-      left: 1px;
-    }
-
-    .slider-playpause.paused .slider-playpause-icon::after {
-      right: 1px;
+      font-size: 18px;
     }
 
     .slider-dots {
@@ -179,19 +159,31 @@
     }
 
     .slider-dot {
+      position: relative;
       height: 8px;
-      width: 8px;
+      width: 8px; /* klein bolletje standaard */
       border-radius: 999px;
       background: var(--dot-grey);
-      transition: width 0.25s ease, background 0.25s ease;
+      overflow: hidden;
+      transition: width 0.25s ease;
+      cursor: pointer;
+    }
+
+    .slider-dot-bar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      background: var(--brand-blue);
+      border-radius: 999px;
     }
 
     .slider-dot.active {
-      width: 58px; /* lang balkje */
-      background: var(--brand-blue);
+      width: 58px; /* lang balkje bij actieve slide */
     }
 
-    /* mobile */
+    /* responsive */
     @media (max-width: 1024px) {
       .hero {
         grid-template-columns: 1fr;
@@ -217,11 +209,7 @@
       }
 
       .slider-card {
-        padding: 28px 24px 36px;
-      }
-
-      .case-link {
-        display: none; /* op mobiel kun je hem eventueel verbergen */
+        padding: 28px 24px 60px;
       }
     }
   </style>
@@ -237,104 +225,111 @@
       </h1>
 
       <p class="hero-subtitle">
-        Met de ambitie om het meest klantvriendelijke WordPress bureau
-        van Nederland te zijn.
+        Met de ambitie om het meest klantvriendelijke WordPress bureau van Nederland te zijn.
       </p>
     </div>
 
     <!-- RECHTERKANT: slider -->
     <div class="hero-slider">
       <div class="slider-card">
-        <!-- slides (5 stuks, met echte Stuurlui-afbeeldingen) -->
-        <a
-          href="https://stuurlui.nl/project/nieuwe-website-nlziet/"
-          class="slider-slide active"
-          data-index="0"
-          data-case-url="https://stuurlui.nl/project/nieuwe-website-nlziet/"
-        >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
-            alt="NLZIET case Stuurlui"
-          />
-        </a>
+        <div class="slider-viewport">
+          <!-- let op: data-case-url voor de knop onderin -->
+          <div
+            class="slider-slide active"
+            data-index="0"
+            data-case-url="https://stuurlui.nl/project/nieuwe-website-nlziet/"
+          >
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
+              alt="NLZIET case"
+            />
+          </div>
 
-        <a
-          href="https://stuurlui.nl/project/company-website-voor-de-action/"
-          class="slider-slide"
-          data-index="1"
-          data-case-url="https://stuurlui.nl/project/company-website-voor-de-action/"
-        >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
-            alt="Action case Stuurlui"
-          />
-        </a>
+          <div
+            class="slider-slide"
+            data-index="1"
+            data-case-url="https://stuurlui.nl/project/company-website-voor-de-action/"
+          >
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
+              alt="Action case"
+            />
+          </div>
 
-        <a
-          href="https://stuurlui.nl/project/heineken-dt-space-website/"
-          class="slider-slide"
-          data-index="2"
-          data-case-url="https://stuurlui.nl/project/heineken-dt-space-website/"
-        >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
-            alt="Heineken D&T Space case Stuurlui"
-          />
-        </a>
+          <div
+            class="slider-slide"
+            data-index="2"
+            data-case-url="https://stuurlui.nl/project/heineken-dt-space-website/"
+          >
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
+              alt="Heineken case"
+            />
+          </div>
 
-        <a
-          href="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
-          class="slider-slide"
-          data-index="3"
-          data-case-url="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
-        >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
-            alt="Haaglanden Medisch Centrum case Stuurlui"
-          />
-        </a>
+          <div
+            class="slider-slide"
+            data-index="3"
+            data-case-url="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
+          >
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
+              alt="HMC case"
+            />
+          </div>
 
-        <a
-          href="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
-          class="slider-slide"
-          data-index="4"
-          data-case-url="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
-        >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
-            alt="LZV case Stuurlui"
-          />
-        </a>
+          <div
+            class="slider-slide"
+            data-index="4"
+            data-case-url="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
+          >
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
+              alt="LZV case"
+            />
+          </div>
+        </div>
 
-        <!-- 1 'Bekijk case' knop, wordt door JS steeds naar juiste URL gezet -->
-        <a href="#" class="case-link" id="caseLink">
+        <!-- één 'Bekijk case' knop, JS zet de juiste URL -->
+        <a href="#" class="case-link" id="caseLink" target="_blank" rel="noopener">
           Bekijk case <span>→</span>
         </a>
       </div>
 
-      <!-- Loader / controls -->
+      <!-- loader & controls -->
       <div class="slider-controls">
         <button
           class="slider-playpause"
           id="sliderPlayPause"
           aria-label="Pauzeer slider"
         >
-          <div class="slider-playpause-icon"></div>
+          ❚❚
         </button>
 
         <div class="slider-dots" id="sliderDots">
-          <!-- 5 bullets -->
-          <div class="slider-dot active" data-index="0"></div>
-          <div class="slider-dot" data-index="1"></div>
-          <div class="slider-dot" data-index="2"></div>
-          <div class="slider-dot" data-index="3"></div>
-          <div class="slider-dot" data-index="4"></div>
+          <div class="slider-dot active" data-index="0">
+            <div class="slider-dot-bar"></div>
+          </div>
+          <div class="slider-dot" data-index="1">
+            <div class="slider-dot-bar"></div>
+          </div>
+          <div class="slider-dot" data-index="2">
+            <div class="slider-dot-bar"></div>
+          </div>
+          <div class="slider-dot" data-index="3">
+            <div class="slider-dot-bar"></div>
+          </div>
+          <div class="slider-dot" data-index="4">
+            <div class="slider-dot-bar"></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <script>
+    const SLIDE_DURATION = 5000; // ms
+
     const slides = document.querySelectorAll(".slider-slide");
     const dots = document.querySelectorAll(".slider-dot");
     const playPauseBtn = document.getElementById("sliderPlayPause");
@@ -342,34 +337,88 @@
 
     let currentIndex = 0;
     let paused = false;
-    const intervalMs = 4000;
+    let slideTimer = null;
+    let slideStartTime = null;
+    let remainingTime = SLIDE_DURATION;
 
-    function setActiveSlide(index) {
-      slides.forEach((slide, i) => {
-        slide.classList.toggle("active", i === index);
-      });
-
-      dots.forEach((dot, i) => {
-        dot.classList.toggle("active", i === index);
-      });
-
-      const activeSlide = slides[index];
+    function updateCaseLink() {
+      const activeSlide = slides[currentIndex];
       const url = activeSlide.dataset.caseUrl;
       caseLink.href = url;
-
-      currentIndex = index;
     }
 
-    function nextSlide() {
-      if (paused) return;
+    function resetDotBars() {
+      dots.forEach((dot) => {
+        dot.classList.remove("active");
+        const bar = dot.querySelector(".slider-dot-bar");
+        bar.style.transition = "none";
+        bar.style.width = "0%";
+      });
+    }
+
+    function startProgressAnimation() {
+      clearTimeout(slideTimer);
+
+      const activeDot = dots[currentIndex];
+      const bar = activeDot.querySelector(".slider-dot-bar");
+
+      slideStartTime = performance.now();
+      remainingTime = SLIDE_DURATION;
+
+      // reset bar
+      bar.style.transition = "none";
+      bar.style.width = "0%";
+      // force reflow
+      void bar.offsetWidth;
+
+      // animate bar van 0 naar 100%
+      bar.style.transition = `width ${remainingTime}ms linear`;
+      bar.style.width = "100%";
+
+      if (!paused) {
+        slideTimer = setTimeout(() => {
+          goToNextSlide();
+        }, remainingTime);
+      }
+    }
+
+    function setActiveSlide(index) {
+      if (index === currentIndex) return;
+
+      const currentSlide = slides[currentIndex];
+      const nextSlide = slides[index];
+
+      // huidige slide naar links en fade out
+      currentSlide.classList.add("animating-out");
+      currentSlide.addEventListener(
+        "transitionend",
+        function handler(e) {
+          if (e.propertyName === "transform") {
+            currentSlide.classList.remove("active", "animating-out");
+            currentSlide.removeEventListener("transitionend", handler);
+          }
+        },
+        { once: true }
+      );
+
+      // nieuwe slide actief → komt van rechts naar midden
+      nextSlide.classList.add("active");
+
+      // dots / loader
+      resetDotBars();
+      dots[index].classList.add("active");
+
+      currentIndex = index;
+      updateCaseLink();
+      startProgressAnimation();
+    }
+
+    function goToNextSlide() {
       const next = (currentIndex + 1) % slides.length;
       setActiveSlide(next);
     }
 
-    // autoplay
-    setInterval(nextSlide, intervalMs);
-
-    // dots klikbaar
+    // dots klikbaar maken
     dots.forEach((dot) => {
       dot.addEventListener("click", () => {
         const i = Number(dot.dataset.index);
@@ -379,12 +428,49 @@
 
     // play / pause
     playPauseBtn.addEventListener("click", () => {
-      paused = !paused;
-      playPauseBtn.classList.toggle("paused", paused);
+      const activeDot = dots[currentIndex];
+      const bar = activeDot.querySelector(".slider-dot-bar");
+
+      if (!paused) {
+        // nu pauzeren
+        paused = true;
+        playPauseBtn.textContent = "▶";
+
+        const now = performance.now();
+        const elapsed = now - slideStartTime;
+        remainingTime = Math.max(SLIDE_DURATION - elapsed, 0);
+        clearTimeout(slideTimer);
+
+        // bar laten staan waar hij is
+        const computedWidth = parseFloat(getComputedStyle(bar).width);
+        const parentWidth = activeDot.getBoundingClientRect().width;
+        const percent = parentWidth ? (computedWidth / parentWidth) * 100 : 0;
+
+        bar.style.transition = "none";
+        bar.style.width = `${percent}%`;
+      } else {
+        // hervatten
+        paused = false;
+        playPauseBtn.textContent = "❚❚";
+
+        slideStartTime = performance.now();
+        // force reflow
+        void bar.offsetWidth;
+        bar.style.transition = `width ${remainingTime}ms linear`;
+        bar.style.width = "100%";
+
+        clearTimeout(slideTimer);
+        slideTimer = setTimeout(() => {
+          goToNextSlide();
+        }, remainingTime);
+      }
     });
 
-    // initial link
-    setActiveSlide(0);
+    // init
+    updateCaseLink();
+    resetDotBars();
+    dots[0].classList.add("active");
+    startProgressAnimation();
   </script>
 </body>
 </html>
