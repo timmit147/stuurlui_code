@@ -12,8 +12,12 @@
       --text-body: #5f6a87;
       --accent-peach: #f6c58f;
       --dot-grey: #d4d9e4;
-      --card-bg: #ffffff;
-      --card-bg-hover: #ffe9e5;
+
+      --card-bg-1: #ffe9e5;
+      --card-bg-2: #fff6e3;
+      --card-bg-3: #eaf4ff;
+      --card-bg-4: #f5f0ff;
+      --card-bg-5: #f5fbf3;
     }
 
     * {
@@ -28,7 +32,7 @@
       color: var(--brand-blue);
     }
 
-    /* === GRID WRAPPER (12 kolommen) === */
+    /* ========= GRID LAY-OUT (12 kolommen) ========= */
 
     .hero {
       max-width: 1440px;
@@ -51,7 +55,7 @@
     }
 
     .hero-title {
-      font-family: Georgia, "Times New Roman", serif; /* vervang door hun serif */
+      font-family: Georgia, "Times New Roman", serif; /* zet hier hun serif in */
       font-size: 64px;
       line-height: 1.15;
       margin: 0 0 32px;
@@ -72,17 +76,21 @@
       margin: 0 0 40px;
     }
 
+    /* badges onder tekst */
+
     .hero-badges {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 32px;
+      align-items: center;
     }
 
     .hero-badges img {
-      height: 60px;
+      height: 54px;
+      display: block;
     }
 
-    /* === SLIDER === */
+    /* ========= SLIDER – HELE CARD SLIDET ========= */
 
     .hero-slider {
       position: relative;
@@ -91,67 +99,88 @@
       margin-left: auto;
     }
 
+    /* buitenste venster met schaduw, alles binnenin schuift */
+    .slider-window {
+      border-radius: 32px;
+      box-shadow: 0 26px 80px rgba(9, 23, 71, 0.16);
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .slider-track {
+      display: flex;
+      transition: transform 0.7s ease;
+    }
+
     .slider-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 32px 32px 72px; /* extra onderruimte voor 'Bekijk case' */
-      box-shadow: 0 18px 45px rgba(9, 23, 71, 0.11);
-      min-height: 440px;
       position: relative;
+      min-width: 100%;
+      padding: 40px 44px 88px;
+      border-radius: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      column-gap: 24px;
+      row-gap: 16px;
+      align-items: center;
+      opacity: 0.35;
+      transition: opacity 0.7s ease, background-color 0.25s ease,
+        transform 0.25s ease;
+      cursor: pointer;
       overflow: visible;
-      transition: background-color 0.25s ease, transform 0.25s ease,
-        box-shadow 0.25s ease;
+    }
+
+    .slider-card.active {
+      opacity: 1;
     }
 
     .slider-card:hover {
-      background: var(--card-bg-hover);
       transform: translateY(-4px);
-      box-shadow: 0 22px 55px rgba(9, 23, 71, 0.16);
+      box-shadow: 0 20px 60px rgba(9, 23, 71, 0.1);
     }
 
-    /* vaste viewport hoogte, afbeelding mag boven/onder uitsteken */
-    .slider-viewport {
-      position: relative;
-      overflow-x: hidden;   /* we snijden links/rechts voor het slide-effect */
-      overflow-y: visible;  /* boven/onder mag uitsteken */
-      height: 320px;        /* vaste hoogte → alle slides zelfde formaat */
+    /* verschillende achtergronden per slide */
+    .slider-card:nth-child(1) { background: var(--card-bg-1); }
+    .slider-card:nth-child(2) { background: var(--card-bg-2); }
+    .slider-card:nth-child(3) { background: var(--card-bg-3); }
+    .slider-card:nth-child(4) { background: var(--card-bg-4); }
+    .slider-card:nth-child(5) { background: var(--card-bg-5); }
+
+    .slide-media {
+      grid-column: 1 / span 2;
+      grid-row: 1 / span 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
     }
 
-    .slider-slide {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate3d(40px, -50%, 0); /* staat net rechts */
-      opacity: 0;
-      transition: transform 0.6s ease, opacity 0.6s ease;
-      pointer-events: none;
-    }
-
-    .slider-slide.active {
-      transform: translate3d(0, -50%, 0); /* midden */
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .slider-slide.active.animating-out {
-      transform: translate3d(-40px, -50%, 0); /* naar links weg */
-      opacity: 0;
-    }
-
-    .slider-slide img {
+    .slide-media img {
+      max-width: 100%;
+      height: auto;
       display: block;
-      height: 120%;  /* iets groter dan viewport → steekt boven/onder uit */
-      width: auto;
-      max-width: none;
     }
 
-    /* 'Bekijk case' rechts onder in de kaart */
+    .slide-logo {
+      grid-column: 1 / span 1;
+      grid-row: 2 / span 1;
+      align-self: flex-end;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      letter-spacing: 0.06em;
+    }
+
+    .slide-logo--nlziet {
+      font-size: 40px;
+      letter-spacing: 0.12em;
+    }
+
+    /* 'Bekijk case' knop – rechts onder in de card */
 
     .case-link {
       position: absolute;
-      right: 26px;
-      bottom: 20px;
-      padding: 10px 18px;
+      right: 32px;
+      bottom: 24px;
+      padding: 10px 20px;
       border-radius: 999px;
       border: 1px solid rgba(21, 42, 82, 0.25);
       font-size: 14px;
@@ -168,7 +197,7 @@
       transform: translateY(1px);
     }
 
-    /* === CONTROLS & LOADER === */
+    /* ========= CONTROLS & LOADER ========= */
 
     .slider-controls {
       margin-top: 24px;
@@ -223,7 +252,7 @@
       width: 58px; /* lang balkje bij actieve slide */
     }
 
-    /* === RESPONSIVE === */
+    /* ========= RESPONSIVE ========= */
 
     @media (max-width: 1024px) {
       .hero {
@@ -237,12 +266,26 @@
 
       .hero-right {
         grid-column: 1 / -1;
-        justify-self: flex-start;
         margin-top: 40px;
       }
 
       .hero-title {
         font-size: 48px;
+      }
+
+      .slider-card {
+        padding: 32px 28px 80px;
+        grid-template-columns: 1fr;
+      }
+
+      .slide-media {
+        grid-column: 1 / -1;
+        justify-content: center;
+      }
+
+      .slide-logo {
+        grid-column: 1 / -1;
+        margin-top: 12px;
       }
     }
 
@@ -254,16 +297,12 @@
       .hero-title {
         font-size: 38px;
       }
-
-      .slider-card {
-        padding: 28px 24px 64px;
-      }
     }
   </style>
 </head>
 <body>
 <section class="hero">
-  <!-- LINKERKANT IN GRID -->
+  <!-- LINKERKANT -->
   <div class="hero-left">
     <h1 class="hero-title">
       Stuurlui levert het<br />
@@ -278,7 +317,6 @@
       van Nederland te zijn.
     </p>
 
-    <!-- badges onderin (plaats hier je eigen assets als je wilt) -->
     <div class="hero-badges">
       <img src="https://stuurlui.nl/wp-content/themes/stuurlui-2023/dist/images/awards/site-van-het-jaar.svg" alt="Website van het jaar" />
       <img src="https://stuurlui.nl/wp-content/themes/stuurlui-2023/dist/images/awards/fonk-150.svg" alt="Fonk 150" />
@@ -288,74 +326,113 @@
     </div>
   </div>
 
-  <!-- RECHTERKANT: SLIDER IN GRID -->
+  <!-- RECHTERKANT: SLIDER -->
   <div class="hero-right hero-slider" id="heroSlider">
-    <div class="slider-card">
-      <div class="slider-viewport">
-        <!-- slides -->
-        <div
-          class="slider-slide active"
+    <div class="slider-window">
+      <div class="slider-track" id="sliderTrack">
+        <!-- Slide 1 – NLZIET -->
+        <article
+          class="slider-card active"
           data-index="0"
           data-case-url="https://stuurlui.nl/project/nieuwe-website-nlziet/"
         >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
-            alt="NLZIET case"
-          />
-        </div>
+          <div class="slide-media">
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
+              alt="NLZIET case"
+            />
+          </div>
+          <div class="slide-logo slide-logo--nlziet">
+            NLZIET
+          </div>
+          <a href="#" class="case-link" target="_blank" rel="noopener">
+            Bekijk case <span>→</span>
+          </a>
+        </article>
 
-        <div
-          class="slider-slide"
+        <!-- Slide 2 – Action -->
+        <article
+          class="slider-card"
           data-index="1"
           data-case-url="https://stuurlui.nl/project/company-website-voor-de-action/"
         >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
-            alt="Action case"
-          />
-        </div>
+          <div class="slide-media">
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
+              alt="Action case"
+            />
+          </div>
+          <div class="slide-logo">
+            ACTION
+          </div>
+          <a href="#" class="case-link" target="_blank" rel="noopener">
+            Bekijk case <span>→</span>
+          </a>
+        </article>
 
-        <div
-          class="slider-slide"
+        <!-- Slide 3 – Heineken astronaut -->
+        <article
+          class="slider-card"
           data-index="2"
           data-case-url="https://stuurlui.nl/project/heineken-dt-space-website/"
         >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
-            alt="Heineken case"
-          />
-        </div>
+          <div class="slide-media">
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
+              alt="Heineken astronaut case"
+            />
+          </div>
+          <div class="slide-logo">
+            HEINEKEN
+          </div>
+          <a href="#" class="case-link" target="_blank" rel="noopener">
+            Bekijk case <span>→</span>
+          </a>
+        </article>
 
-        <div
-          class="slider-slide"
+        <!-- Slide 4 – HMC -->
+        <article
+          class="slider-card"
           data-index="3"
           data-case-url="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
         >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
-            alt="HMC case"
-          />
-        </div>
+          <div class="slide-media">
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
+              alt="HMC case"
+            />
+          </div>
+          <div class="slide-logo">
+            H+MC
+          </div>
+          <a href="#" class="case-link" target="_blank" rel="noopener">
+            Bekijk case <span>→</span>
+          </a>
+        </article>
 
-        <div
-          class="slider-slide"
+        <!-- Slide 5 – LZV -->
+        <article
+          class="slider-card"
           data-index="4"
           data-case-url="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
         >
-          <img
-            src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
-            alt="LZV case"
-          />
-        </div>
+          <div class="slide-media">
+            <img
+              src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
+              alt="LZV case"
+            />
+          </div>
+          <div class="slide-logo">
+            LZV
+          </div>
+          <a href="#" class="case-link" target="_blank" rel="noopener">
+            Bekijk case <span>→</span>
+          </a>
+        </article>
       </div>
-
-      <!-- 'Bekijk case' knop rechts onder -->
-      <a href="#" class="case-link" id="caseLink" target="_blank" rel="noopener">
-        Bekijk case <span>→</span>
-      </a>
     </div>
 
-    <!-- loader & controls -->
+    <!-- Loader & controls -->
     <div class="slider-controls">
       <button
         class="slider-playpause"
@@ -389,26 +466,47 @@
 <script>
   const SLIDE_DURATION = 5000; // ms
 
-  const slides = document.querySelectorAll(".slider-slide");
+  const track = document.getElementById("sliderTrack");
+  const cards = document.querySelectorAll(".slider-card");
   const dots = document.querySelectorAll(".slider-dot");
   const playPauseBtn = document.getElementById("sliderPlayPause");
-  const caseLink = document.getElementById("caseLink");
   const heroSlider = document.getElementById("heroSlider");
 
   let currentIndex = 0;
   let userPaused = false;
   let hoverPaused = false;
-  let progress = 0; // 0-1
+  let progress = 0; // 0–1
   let lastTimestamp = null;
 
   function isPaused() {
     return userPaused || hoverPaused;
   }
 
-  function updateCaseLink() {
-    const activeSlide = slides[currentIndex];
-    const url = activeSlide.dataset.caseUrl;
-    caseLink.href = url;
+  function updateTrackTransform() {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+  }
+
+  function updateCaseLinks() {
+    cards.forEach((card, index) => {
+      const url = card.dataset.caseUrl;
+      const link = card.querySelector(".case-link");
+      if (index === currentIndex) {
+        link.href = url;
+      }
+    });
+  }
+
+  function setActiveCard(index) {
+    cards.forEach((card, i) => {
+      card.classList.toggle("active", i === index);
+    });
+    currentIndex = index;
+    progress = 0;
+    lastTimestamp = null;
+    updateTrackTransform();
+    setActiveDot(index);
+    updateCaseLinks();
+    updateProgressBar();
   }
 
   function setActiveDot(index) {
@@ -417,6 +515,12 @@
     });
   }
 
+  function goToNextSlide() {
+    const next = (currentIndex + 1) % cards.length;
+    setActiveCard(next);
+  }
+
+  // loader / progress
   function updateProgressBar() {
     dots.forEach((dot, i) => {
       const bar = dot.querySelector(".slider-dot-bar");
@@ -428,47 +532,11 @@
     });
   }
 
-  function setActiveSlide(index) {
-    if (index === currentIndex) return;
-
-    const currentSlide = slides[currentIndex];
-    const nextSlide = slides[index];
-
-    // huidige slide weg laten schuiven
-    currentSlide.classList.add("animating-out");
-
-    currentSlide.addEventListener(
-      "transitionend",
-      function handler(e) {
-        if (e.propertyName === "transform") {
-          currentSlide.classList.remove("active", "animating-out");
-          currentSlide.removeEventListener("transitionend", handler);
-        }
-      },
-      { once: true }
-    );
-
-    // nieuwe slide binnen laten komen
-    nextSlide.classList.add("active");
-
-    currentIndex = index;
-    progress = 0;
-    lastTimestamp = null;
-    setActiveDot(index);
-    updateCaseLink();
-    updateProgressBar();
-  }
-
-  function goToNextSlide() {
-    const next = (currentIndex + 1) % slides.length;
-    setActiveSlide(next);
-  }
-
   // dots klikbaar
   dots.forEach((dot) => {
     dot.addEventListener("click", () => {
       const i = Number(dot.dataset.index);
-      setActiveSlide(i);
+      setActiveCard(i);
     });
   });
 
@@ -478,7 +546,7 @@
     playPauseBtn.textContent = userPaused ? "▶" : "❚❚";
   });
 
-  // hover pauze: zolang je over de slider hangt stopt hij
+  // hover pauze – zolang je over de slider bent stopt hij
   heroSlider.addEventListener("mouseenter", () => {
     hoverPaused = true;
   });
@@ -486,7 +554,7 @@
     hoverPaused = false;
   });
 
-  // animatielus voor progress bar + autoplay
+  // animatielus voor loader + autoplay
   function loop(timestamp) {
     if (lastTimestamp == null) lastTimestamp = timestamp;
     const dt = timestamp - lastTimestamp;
@@ -499,15 +567,12 @@
         goToNextSlide();
       }
     }
-
     updateProgressBar();
     requestAnimationFrame(loop);
   }
 
   // init
-  updateCaseLink();
-  setActiveDot(0);
-  updateProgressBar();
+  setActiveCard(0);
   requestAnimationFrame(loop);
 </script>
 </body>
