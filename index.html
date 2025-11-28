@@ -13,11 +13,11 @@
       --accent-peach: #f6c58f;
       --dot-grey: #d4d9e4;
 
-      --card-bg-1: #ffe9e5;
-      --card-bg-2: #fff6e3;
-      --card-bg-3: #eaf4ff;
-      --card-bg-4: #f5f0ff;
-      --card-bg-5: #f5fbf3;
+      --card-bg-1: #ffe1e4;
+      --card-bg-2: #ffeec6;
+      --card-bg-3: #dfe9ff;
+      --card-bg-4: #efe5ff;
+      --card-bg-5: #ddf8f0;
     }
 
     * {
@@ -38,16 +38,17 @@
     .hero {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 80px 40px 120px;
+      padding: 80px 40px 80px;  /* aangepast */
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      column-gap: 64px;   /* extra ruimte tussen links & rechts */
+      column-gap: 64px;
       row-gap: 40px;
       align-items: flex-start;
     }
 
     .hero-left {
       grid-column: 1 / span 6;
+      align-self: center; /* midden verticaal */
     }
 
     .hero-right {
@@ -56,8 +57,8 @@
     }
 
     .hero-title {
-      font-family: Georgia, "Times New Roman", serif; /* vervang door hun serif */
-      font-size: 54px;          /* aangepast van 64 → 54 */
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 54px;
       line-height: 1.15;
       margin: 0 0 32px;
       letter-spacing: 0.02em;
@@ -86,12 +87,12 @@
       margin-left: auto;
     }
 
-    /* vierkant, 1 kaart per keer */
+    /* buitenste venster: square + overflow hidden */
     .slider-window {
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      overflow: visible; /* kaart & image mogen uitsteken */
+      overflow: hidden;        /* laat maar één vierkant zien */
     }
 
     .slider-track {
@@ -100,143 +101,179 @@
       transition: transform 0.7s ease;
     }
 
+    /* Eén slide (buitenframe) */
     .slider-card {
       position: relative;
       flex: 0 0 100%;
       height: 100%;
-      border-radius: 32px;
-      padding: 32px;
-      cursor: pointer;
-      overflow: visible; /* tv mag buiten de kaart */
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
       opacity: 0.45;
       transition: opacity 0.4s ease;
-      z-index: 0;
     }
 
     .slider-card.active {
       opacity: 1;
     }
 
-    /* achtergrond per slide */
-    .slider-card:nth-child(1) { background: var(--card-bg-1); }
-    .slider-card:nth-child(2) { background: var(--card-bg-2); }
-    .slider-card:nth-child(3) { background: var(--card-bg-3); }
-    .slider-card:nth-child(4) { background: var(--card-bg-4); }
-    .slider-card:nth-child(5) { background: var(--card-bg-5); }
+    /* Inner square: echte kaart die je ziet */
+    .card-surface {
+      position: relative;
+      width: calc(100% - 40px);   /* 20px marge rondom → ruimte voor beeld */
+      height: calc(100% - 40px);
+      margin: 20px;
+      border-radius: 32px;
+      border: 3px solid rgba(21, 42, 82, 0.18); /* dikke rand */
+      overflow: visible;
+      padding: 32px;
+      z-index: 0;
+    }
 
-    /* === HOVER FILTERS (via ::before overlay) === */
+    /* achtergrond per case */
+    .slider-card:nth-child(1) .card-surface { background: var(--card-bg-1); }
+    .slider-card:nth-child(2) .card-surface { background: var(--card-bg-2); }
+    .slider-card:nth-child(3) .card-surface { background: var(--card-bg-3); }
+    .slider-card:nth-child(4) .card-surface { background: var(--card-bg-4); }
+    .slider-card:nth-child(5) .card-surface { background: var(--card-bg-5); }
 
-    .slider-card::before {
+    /* === HOVER FILTERS – duidelijker & meer animatie === */
+
+    .card-surface::before {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
       opacity: 0;
       pointer-events: none;
-      z-index: -1; /* achter content */
+      z-index: -1;
       transition: opacity 0.25s ease;
     }
 
-    /* 1. NLZIET – tv static / noise */
-    .slider-card:nth-child(1)::before {
+    /* 1. NLZIET – zware tv static */
+    .slider-card:nth-child(1) .card-surface::before {
       background-image:
         repeating-linear-gradient(
           0deg,
-          rgba(255,255,255,0.25) 0px,
-          rgba(255,255,255,0.25) 1px,
-          rgba(0,0,0,0.1) 1px,
-          rgba(0,0,0,0.1) 2px
+          rgba(255,255,255,0.3) 0px,
+          rgba(255,255,255,0.3) 1px,
+          rgba(0,0,0,0.4) 1px,
+          rgba(0,0,0,0.4) 2px
         );
       mix-blend-mode: soft-light;
     }
-    .slider-card:nth-child(1):hover::before {
-      opacity: 0.45;
-      animation: tv-static 0.25s steps(4) infinite;
+    .slider-card:nth-child(1) .card-surface:hover::before {
+      opacity: 0.9;
+      animation: tv-static 0.2s steps(6) infinite;
     }
     @keyframes tv-static {
       0% { transform: translateY(0); }
-      100% { transform: translateY(6px); }
+      100% { transform: translateY(10px); }
     }
 
-    /* 2. Action – papier / korrel */
-    .slider-card:nth-child(2)::before {
+    /* 2. Action – duidelijk papier + ruw */
+    .slider-card:nth-child(2) .card-surface::before {
       background-image:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.7), transparent 55%),
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(255,220,200,0.6), transparent 60%),
         repeating-linear-gradient(
-          45deg,
-          rgba(0,0,0,0.04) 0px,
-          rgba(0,0,0,0.04) 1px,
-          transparent 1px,
-          transparent 3px
+          135deg,
+          rgba(0,0,0,0.1) 0px,
+          rgba(0,0,0,0.1) 1.5px,
+          transparent 1.5px,
+          transparent 4px
         );
       mix-blend-mode: multiply;
     }
-    .slider-card:nth-child(2):hover::before {
-      opacity: 0.6;
+    .slider-card:nth-child(2) .card-surface:hover::before {
+      opacity: 0.9;
+      animation: paper-wiggle 2s ease-in-out infinite alternate;
+    }
+    @keyframes paper-wiggle {
+      0% { transform: translate3d(0,0,0); }
+      100% { transform: translate3d(3px,-3px,0); }
     }
 
-    /* 3. Heineken – space / galaxy */
-    .slider-card:nth-child(3)::before {
+    /* 3. Heineken – space/galaxy */
+    .slider-card:nth-child(3) .card-surface::before {
       background-image:
-        radial-gradient(circle at 0 0, rgba(255,255,255,0.4) 0, transparent 40%),
-        radial-gradient(circle at 80% 0, rgba(255,255,255,0.25) 0, transparent 55%),
-        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.2) 0, transparent 55%),
-        linear-gradient(135deg, #111a3b, #243a6b);
-      mix-blend-mode: hard-light;
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.85) 0, transparent 45%),
+        radial-gradient(circle at 90% 10%, rgba(133,205,255,0.8) 0, transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(255,255,255,0.5) 0, transparent 60%),
+        linear-gradient(135deg, #020619, #132a5c);
+      mix-blend-mode: screen;
     }
-    .slider-card:nth-child(3):hover::before {
-      opacity: 0.75;
+    .slider-card:nth-child(3) .card-surface:hover::before {
+      opacity: 0.95;
+      animation: space-pulse 3s ease-in-out infinite alternate;
+    }
+    @keyframes space-pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
     }
 
-    /* 4. HMC – klinisch/medisch */
-    .slider-card:nth-child(4)::before {
+    /* 4. HMC – helder klinisch / medisch */
+    .slider-card:nth-child(4) .card-surface::before {
       background-image:
-        linear-gradient(135deg, rgba(255,255,255,0.9), rgba(215,236,247,0.9)),
+        linear-gradient(135deg, rgba(255,255,255,1), rgba(211,238,255,0.95)),
         repeating-linear-gradient(
           90deg,
-          rgba(0,100,180,0.07) 0,
-          rgba(0,100,180,0.07) 1px,
-          transparent 1px,
-          transparent 8px
+          rgba(0,120,210,0.18) 0,
+          rgba(0,120,210,0.18) 2px,
+          transparent 2px,
+          transparent 10px
         );
       mix-blend-mode: screen;
     }
-    .slider-card:nth-child(4):hover::before {
-      opacity: 0.85;
+    .slider-card:nth-child(4) .card-surface:hover::before {
+      opacity: 1;
+      animation: hmc-shift 1.6s ease-in-out infinite alternate;
+    }
+    @keyframes hmc-shift {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(6px); }
     }
 
-    /* 5. LZV – kalm blauw/groen */
-    .slider-card:nth-child(5)::before {
+    /* 5. LZV – sterke blauw/groen glow */
+    .slider-card:nth-child(5) .card-surface::before {
       background-image:
-        radial-gradient(circle at 0 0, rgba(255,255,255,0.8) 0, transparent 55%),
-        linear-gradient(135deg, #c7f0e8, #6db0d8);
+        radial-gradient(circle at 0 0, rgba(255,255,255,0.9) 0, transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(0,255,200,0.8) 0, transparent 55%),
+        linear-gradient(135deg, #4bb3ff, #00c49a);
       mix-blend-mode: soft-light;
     }
-    .slider-card:nth-child(5):hover::before {
-      opacity: 0.8;
+    .slider-card:nth-child(5) .card-surface:hover::before {
+      opacity: 0.95;
+      animation: lzv-breathe 2.4s ease-in-out infinite alternate;
+    }
+    @keyframes lzv-breathe {
+      0% { transform: scale(1); filter: blur(0); }
+      100% { transform: scale(1.03); filter: blur(1px); }
     }
 
-    /* afbeelding absoluut; steekt boven & rechts uit, maar stopt ruim boven knop */
+    /* afbeelding: relatief aan card-surface → steekt buiten border
+       maar niet buiten slider-window (door marge 20px)  */
 
     .slide-media {
       position: absolute;
-      top: -20px;         /* 20px boven card */
-      right: -20px;       /* 20px buiten naar rechts */
-      bottom: 96px;       /* genoeg ruimte boven knop */
+      top: -20px;     /* 20px boven rand square */
+      right: -20px;   /* 20px buiten rand square */
+      bottom: 80px;   /* voldoende ruimte boven knop */
       display: flex;
       align-items: flex-start;
       justify-content: flex-end;
       z-index: 1;
+      pointer-events: none;
     }
 
     .slide-media img {
-      height: 100%;       /* tot net boven de knop */
+      height: 100%;
       width: auto;
-      max-width: 130%;
+      max-width: 140%;
       display: block;
     }
 
-    /* knop onderin, kleur verandert op hover card */
+    /* knop onderin, kleur verandert op hover */
 
     .case-link {
       position: absolute;
@@ -261,7 +298,7 @@
       transform: translateY(1px);
     }
 
-    .slider-card:hover .case-link {
+    .card-surface:hover .case-link {
       background: var(--brand-blue);
       color: #ffffff;
     }
@@ -274,7 +311,7 @@
       align-items: center;
       gap: 18px;
       position: relative;
-      z-index: 5; /* zeker boven alles → goed klikbaar */
+      z-index: 5;
     }
 
     .slider-playpause {
@@ -373,7 +410,6 @@
       van Nederland te zijn.
     </p>
 
-    <!-- extra divider onder de tekst -->
     <hr class="hero-divider" />
   </div>
 
@@ -383,92 +419,102 @@
       <div class="slider-track" id="sliderTrack">
         <!-- Slide 1 – NLZIET -->
         <article class="slider-card active" data-index="0">
-          <div class="slide-media">
-            <img
-              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
-              alt="NLZIET case"
-            />
+          <div class="card-surface">
+            <div class="slide-media">
+              <img
+                src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
+                alt="NLZIET case"
+              />
+            </div>
+            <a
+              href="https://stuurlui.nl/project/nieuwe-website-nlziet/"
+              class="case-link"
+              target="_blank"
+              rel="noopener"
+            >
+              Bekijk case <span>→</span>
+            </a>
           </div>
-          <a
-            href="https://stuurlui.nl/project/nieuwe-website-nlziet/"
-            class="case-link"
-            target="_blank"
-            rel="noopener"
-          >
-            Bekijk case <span>→</span>
-          </a>
         </article>
 
         <!-- Slide 2 – Action -->
         <article class="slider-card" data-index="1">
-          <div class="slide-media">
-            <img
-              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
-              alt="Action case"
-            />
+          <div class="card-surface">
+            <div class="slide-media">
+              <img
+                src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
+                alt="Action case"
+              />
+            </div>
+            <a
+              href="https://stuurlui.nl/project/company-website-voor-de-action/"
+              class="case-link"
+              target="_blank"
+              rel="noopener"
+            >
+              Bekijk case <span>→</span>
+            </a>
           </div>
-          <a
-            href="https://stuurlui.nl/project/company-website-voor-de-action/"
-            class="case-link"
-            target="_blank"
-            rel="noopener"
-          >
-            Bekijk case <span>→</span>
-          </a>
         </article>
 
         <!-- Slide 3 – Heineken -->
         <article class="slider-card" data-index="2">
-          <div class="slide-media">
-            <img
-              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
-              alt="Heineken case"
-            />
+          <div class="card-surface">
+            <div class="slide-media">
+              <img
+                src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
+                alt="Heineken case"
+              />
+            </div>
+            <a
+              href="https://stuurlui.nl/project/heineken-dt-space-website/"
+              class="case-link"
+              target="_blank"
+              rel="noopener"
+            >
+              Bekijk case <span>→</span>
+            </a>
           </div>
-          <a
-            href="https://stuurlui.nl/project/heineken-dt-space-website/"
-            class="case-link"
-            target="_blank"
-            rel="noopener"
-          >
-            Bekijk case <span>→</span>
-          </a>
         </article>
 
         <!-- Slide 4 – HMC -->
         <article class="slider-card" data-index="3">
-          <div class="slide-media">
-            <img
-              src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
-              alt="HMC case"
-            />
+          <div class="card-surface">
+            <div class="slide-media">
+              <img
+                src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
+                alt="HMC case"
+              />
+            </div>
+            <a
+              href="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
+              class="case-link"
+              target="_blank"
+              rel="noopener"
+            >
+              Bekijk case <span>→</span>
+            </a>
           </div>
-          <a
-            href="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
-            class="case-link"
-            target="_blank"
-            rel="noopener"
-          >
-            Bekijk case <span>→</span>
-          </a>
         </article>
 
         <!-- Slide 5 – LZV -->
         <article class="slider-card" data-index="4">
-          <div class="slide-media">
-            <img
-              src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
-              alt="LZV case"
-            />
+          <div class="card-surface">
+            <div class="slide-media">
+              <img
+                src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
+                alt="LZV case"
+              />
+            </div>
+            <a
+              href="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
+              class="case-link"
+              target="_blank"
+              rel="noopener"
+            >
+              Bekijk case <span>→</span>
+            </a>
           </div>
-          <a
-            href="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
-            class="case-link"
-            target="_blank"
-            rel="noopener"
-          >
-            Bekijk case <span>→</span>
-          </a>
         </article>
       </div>
     </div>
@@ -569,7 +615,7 @@
     updateProgressBar();
   }
 
-  // wanneer we op de clone komen → instant terug naar echte eerste kaart
+  // wanneer we op de clone komen → instant terug naar eerste kaart
   track.addEventListener("transitionend", () => {
     if (positionIndex === slidesCount) {
       positionIndex = 0;
