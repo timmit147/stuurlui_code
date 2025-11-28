@@ -30,10 +30,10 @@
         sans-serif;
       background: var(--brand-bg);
       color: var(--brand-blue);
-      overflow-x: hidden;
+      overflow-x: hidden; /* geen horizontale scrollbars */
     }
 
-    /* ========= GRID ========= */
+    /* ========= GRID (12 kolommen) ========= */
 
     .hero {
       max-width: 1440px;
@@ -78,7 +78,7 @@
       margin: 0 0 32px;
     }
 
-    /* ========= SLIDER ========= */
+    /* ========= SLIDER – vierkant ========= */
 
     .hero-slider {
       position: relative;
@@ -91,7 +91,7 @@
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      overflow: hidden;        /* maar binnenin laten we tv/astro uitsteken */
+      overflow: hidden; /* maar binnenin laten we tv/astro uitsteken */
     }
 
     .slider-track {
@@ -115,156 +115,148 @@
       opacity: 1;
     }
 
-    /* Inner square met dikke rand */
+    /* Inner square: echte kaart die je ziet */
     .card-surface {
       position: relative;
-      width: calc(100% - 40px);
+      width: calc(100% - 40px);   /* 20px marge rondom → ruimte voor beeld */
       height: calc(100% - 40px);
       margin: 20px;
       border-radius: 32px;
-      border: 3px solid rgba(21, 42, 82, 0.22);
-      overflow: hidden; /* filter blijft binnen vierkant */
+      border: 3px solid rgba(21, 42, 82, 0.18); /* dikke rand */
+      overflow: visible;
       padding: 32px;
       z-index: 0;
     }
 
+    /* achtergrond per case */
     .slider-card:nth-child(1) .card-surface { background: var(--card-bg-1); }
     .slider-card:nth-child(2) .card-surface { background: var(--card-bg-2); }
     .slider-card:nth-child(3) .card-surface { background: var(--card-bg-3); }
     .slider-card:nth-child(4) .card-surface { background: var(--card-bg-4); }
     .slider-card:nth-child(5) .card-surface { background: var(--card-bg-5); }
 
-    /* === HOVER FILTERS – duidelijk & binnen het vierkant === */
+    /* === HOVER FILTERS – binnen square, border blijft schoon === */
 
     .card-surface::before {
       content: "";
       position: absolute;
-      inset: 4px;              /* net binnen de rand */
-      border-radius: 28px;
+      inset: 4px;                  /* net binnen de rand */
+      border-radius: 28px;         /* iets kleiner dan 32px */
       opacity: 0;
       pointer-events: none;
-      z-index: 0;
+      z-index: -1;
       transition: opacity 0.25s ease;
     }
 
-    /* 1. NLZIET – tv static */
+    /* 1. NLZIET – tv static, nu met background-position i.p.v. translate */
     .slider-card:nth-child(1) .card-surface::before {
       background-image:
         repeating-linear-gradient(
           0deg,
-          rgba(255,255,255,0.35) 0px,
-          rgba(255,255,255,0.35) 1px,
-          rgba(0,0,0,0.45) 1px,
-          rgba(0,0,0,0.45) 2px
+          rgba(255,255,255,0.3) 0px,
+          rgba(255,255,255,0.3) 1px,
+          rgba(0,0,0,0.4) 1px,
+          rgba(0,0,0,0.4) 2px
         );
       mix-blend-mode: soft-light;
-      background-size: 100% 3px;
+      background-size: 100% 4px;
+      background-repeat: repeat-y;
     }
     .slider-card:nth-child(1) .card-surface:hover::before {
-      opacity: 0.95;
-      animation: tv-static 0.18s steps(5) infinite;
+      opacity: 0.9;
+      animation: tv-static 0.22s steps(6) infinite;
     }
     @keyframes tv-static {
       0% { background-position-y: 0; }
-      100% { background-position-y: 6px; }
+      100% { background-position-y: 16px; }
     }
 
-    /* 2. Action – papier/ruw, duidelijk */
+    /* 2. Action – duidelijk papier + ruw */
     .slider-card:nth-child(2) .card-surface::before {
       background-image:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.95), transparent 55%),
-        radial-gradient(circle at 80% 100%, rgba(255,200,180,0.75), transparent 60%),
+        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(255,220,200,0.6), transparent 60%),
         repeating-linear-gradient(
           135deg,
-          rgba(0,0,0,0.18) 0px,
-          rgba(0,0,0,0.18) 1.5px,
+          rgba(0,0,0,0.1) 0px,
+          rgba(0,0,0,0.1) 1.5px,
           transparent 1.5px,
           transparent 4px
         );
       mix-blend-mode: multiply;
     }
     .slider-card:nth-child(2) .card-surface:hover::before {
-      opacity: 0.95;
-      animation: paper-shift 1.8s ease-in-out infinite alternate;
+      opacity: 0.9;
+      animation: paper-wiggle 2s ease-in-out infinite alternate;
     }
-    @keyframes paper-shift {
-      0% { background-position: 0 0, 0 0, 0 0; }
-      100% { background-position: -6px 4px, 4px -6px, 6px -6px; }
+    @keyframes paper-wiggle {
+      0% { transform: translate3d(0,0,0); }
+      100% { transform: translate3d(3px,-3px,0); }
     }
 
-    /* 3. Heineken – space met bewegende sterren */
+    /* 3. Heineken – space/galaxy */
     .slider-card:nth-child(3) .card-surface::before {
       background-image:
-        radial-gradient(circle at 5% 10%, rgba(255,255,255,0.9) 0, transparent 45%),
-        radial-gradient(circle at 85% 15%, rgba(133,205,255,0.9) 0, transparent 55%),
-        radial-gradient(circle at 15% 80%, rgba(255,255,255,0.7) 0, transparent 55%),
-        radial-gradient(circle at 90% 90%, rgba(180,220,255,0.7) 0, transparent 55%),
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.85) 0, transparent 45%),
+        radial-gradient(circle at 90% 10%, rgba(133,205,255,0.8) 0, transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(255,255,255,0.5) 0, transparent 60%),
         linear-gradient(135deg, #020619, #132a5c);
       mix-blend-mode: screen;
-      background-size: 120px 120px, 160px 160px, 180px 180px, 220px 220px, cover;
     }
     .slider-card:nth-child(3) .card-surface:hover::before {
-      opacity: 1;
-      animation: space-stars 4s linear infinite;
+      opacity: 0.95;
+      animation: space-pulse 3s ease-in-out infinite alternate;
     }
-    @keyframes space-stars {
-      0%   { background-position: 0 0,   0 0,   0 0,   0 0,   0 0; }
-      100% { background-position: 40px 20px,  -30px 40px,  20px -40px, -40px -20px, 0 0; }
+    @keyframes space-pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
     }
 
-    /* 4. HMC – heartbeat */
+    /* 4. HMC – helder klinisch / medisch */
     .slider-card:nth-child(4) .card-surface::before {
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(214,239,255,0.96)),
+      background-image:
+        linear-gradient(135deg, rgba(255,255,255,1), rgba(211,238,255,0.95)),
         repeating-linear-gradient(
           90deg,
-          rgba(0,120,210,0.25) 0,
-          rgba(0,120,210,0.25) 2px,
+          rgba(0,120,210,0.18) 0,
+          rgba(0,120,210,0.18) 2px,
           transparent 2px,
           transparent 10px
-        ),
-        radial-gradient(circle at 10% 50%, rgba(0,120,210,0.25) 0, transparent 35%);
+        );
       mix-blend-mode: screen;
-      background-size: cover, 20px 100%, 120px 120px;
     }
     .slider-card:nth-child(4) .card-surface:hover::before {
       opacity: 1;
-      animation: heartbeat 1.4s ease-in-out infinite;
+      animation: hmc-shift 1.6s ease-in-out infinite alternate;
     }
-    @keyframes heartbeat {
-      0%, 20%, 60%, 100% { transform: scaleX(1); }
-      30% { transform: scaleX(1.06); }
-      40% { transform: scaleX(0.97); }
-      70% { transform: scaleX(1.04); }
-      80% { transform: scaleX(0.98); }
+    @keyframes hmc-shift {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(6px); }
     }
 
-    /* 5. LZV – blauwe camo */
+    /* 5. LZV – sterke blauw/groen glow */
     .slider-card:nth-child(5) .card-surface::before {
       background-image:
-        radial-gradient(circle at 10% 20%, #4bb3ff 0, transparent 55%),
-        radial-gradient(circle at 60% 0, #00c4ff 0, transparent 55%),
-        radial-gradient(circle at 90% 70%, #005f99 0, transparent 55%),
-        radial-gradient(circle at 30% 80%, #00c49a 0, transparent 55%);
+        radial-gradient(circle at 0 0, rgba(255,255,255,0.9) 0, transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(0,255,200,0.8) 0, transparent 55%),
+        linear-gradient(135deg, #4bb3ff, #00c49a);
       mix-blend-mode: soft-light;
-      background-size: 180px 160px, 200px 180px, 220px 200px, 190px 180px;
     }
     .slider-card:nth-child(5) .card-surface:hover::before {
-      opacity: 1;
-      animation: camo-flow 3s ease-in-out infinite alternate;
+      opacity: 0.95;
+      animation: lzv-breathe 2.4s ease-in-out infinite alternate;
     }
-    @keyframes camo-flow {
-      0% { background-position: 0 0,   0 0,   0 0,   0 0; }
-      100% { background-position: -25px 15px,  20px -20px, -30px -10px, 15px 25px; }
+    @keyframes lzv-breathe {
+      0% { transform: scale(1); filter: blur(0); }
+      100% { transform: scale(1.03); filter: blur(1px); }
     }
 
-    /* Afbeelding – iets groter & rotatie op hover */
-
+    /* afbeelding: mag buiten de square, nu iets hoger/rechter */
     .slide-media {
       position: absolute;
-      top: -20px;
-      right: -20px;
-      bottom: 80px;       /* ruimte boven knop */
+      top: -30px;
+      right: -30px;
+      bottom: 80px;
       display: flex;
       align-items: flex-start;
       justify-content: flex-end;
@@ -277,16 +269,9 @@
       width: auto;
       max-width: 140%;
       display: block;
-      transition: transform 0.35s ease;
-      transform-origin: center center;
     }
 
-    .card-surface:hover .slide-media img {
-      transform: scale(1.06) rotate(-4deg);
-    }
-
-    /* Knop */
-
+    /* knop onderin, smooth hover */
     .case-link {
       position: absolute;
       right: 24px;
@@ -315,7 +300,7 @@
       color: #ffffff;
     }
 
-    /* ========= CONTROLS ========= */
+    /* ========= CONTROLS & LOADER ========= */
 
     .slider-controls {
       margin-top: 24px;
@@ -627,16 +612,10 @@
     updateProgressBar();
   }
 
-  // zachte reset als we op de clone komen
   track.addEventListener("transitionend", () => {
     if (positionIndex === slidesCount) {
       positionIndex = 0;
-      // reset zonder zichtbare "snap"
-      track.style.transition = "none";
-      track.style.transform = `translateX(0)`;
-      requestAnimationFrame(() => {
-        track.style.transition = "transform 0.7s ease";
-      });
+      goToPosition(positionIndex, false);
     }
   });
 
@@ -687,7 +666,6 @@
     requestAnimationFrame(loop);
   }
 
-  // init
   applyActive();
   goToPosition(0, false);
   requestAnimationFrame(loop);
