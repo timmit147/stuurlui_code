@@ -1,175 +1,390 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stuurlui Hero</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stuurlui hero clone</title>
 
-<style>
+  <style>
+    :root {
+      --brand-blue: #152a52;
+      --brand-bg: #fbf8f4;
+      --text-body: #5f6a87;
+      --accent-peach: #f6c58f;
+      --dot-grey: #d4d9e4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #fbf9f7;
-        color: #152a52;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: var(--brand-bg);
+      color: var(--brand-blue);
     }
 
     .hero {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        max-width: 1600px;
-        margin: auto;
-        padding: 80px 60px;
-        align-items: center;
-        gap: 60px;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 80px 60px 120px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 60px;
+      align-items: center;
     }
 
-    h1 {
-        font-size: 64px;
-        font-weight: 700;
-        line-height: 1.15;
-        margin-bottom: 40px;
+    .hero-title {
+      font-family: Georgia, "Times New Roman", serif; /* vervang door hun echte serif */
+      font-size: 64px;
+      line-height: 1.15;
+      margin: 0 0 40px;
+      letter-spacing: 0.02em;
     }
 
-    p {
-        color: #5c6785;
-        font-size: 20px;
-        max-width: 550px;
+    .hero-subtitle {
+      font-size: 20px;
+      line-height: 1.6;
+      color: var(--text-body);
+      max-width: 520px;
     }
 
-    /* --- Right side: carousel box --- */
+    /* --- Slider card rechts --- */
 
-    .carousel-wrapper {
-        position: relative;
-        width: 100%;
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-        overflow: hidden;
-        min-height: 480px;
+    .hero-slider {
+      position: relative;
+      width: 100%;
+      max-width: 540px;
+      margin-left: auto;
     }
 
-    .slide {
-        display: none;
-        width: 100%;
+    .slider-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px 32px 40px;
+      box-shadow: 0 18px 45px rgba(9, 23, 71, 0.11);
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: visible;
     }
 
-    .slide.active {
-        display: block;
+    .slider-slide {
+      display: none;
+      align-items: center;
+      justify-content: center;
     }
 
-    .carousel-controls {
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    .slider-slide.active {
+      display: flex;
     }
 
-    .pause-btn {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        background: #f5cca8;
-        font-size: 18px;
+    .slider-slide img {
+      display: block;
+      max-width: 100%;
+      height: auto;
     }
 
-    .dots {
-        display: flex;
-        gap: 8px;
+    /* "Bekijk case" knop rechtsboven in de card */
+    .case-link {
+      position: absolute;
+      top: 18px;
+      right: 26px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(21, 42, 82, 0.25);
+      font-size: 14px;
+      color: var(--brand-blue);
+      text-decoration: none;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .dot {
-        width: 10px;
-        height: 10px;
-        background: #cbd3e0;
-        border-radius: 50%;
+    .case-link span {
+      font-size: 16px;
+      transform: translateY(1px);
     }
 
-    .dot.active {
-        background: #152a52;
+    /* --- Loader / controls onder de card --- */
+
+    .slider-controls {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
     }
 
-    /* Mobile layout */
-    @media(max-width: 950px) {
-        .hero {
-            grid-template-columns: 1fr;
-            text-align: left;
-        }
+    .slider-playpause {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent-peach);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
     }
-</style>
+
+    .slider-playpause-icon {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 8px 0 8px 12px; /* driehoek */
+      border-color: transparent transparent transparent var(--brand-blue);
+      margin-left: 2px;
+    }
+
+    .slider-playpause.paused .slider-playpause-icon {
+      /* pauze-icoon */
+      width: 12px;
+      height: 12px;
+      border: none;
+      background: none;
+      position: relative;
+      margin-left: 0;
+    }
+
+    .slider-playpause.paused .slider-playpause-icon::before,
+    .slider-playpause.paused .slider-playpause-icon::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--brand-blue);
+      border-radius: 999px;
+    }
+
+    .slider-playpause.paused .slider-playpause-icon::before {
+      left: 1px;
+    }
+
+    .slider-playpause.paused .slider-playpause-icon::after {
+      right: 1px;
+    }
+
+    .slider-dots {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .slider-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 999px;
+      background: var(--dot-grey);
+      transition: width 0.25s ease, background 0.25s ease;
+    }
+
+    .slider-dot.active {
+      width: 58px; /* lang balkje */
+      background: var(--brand-blue);
+    }
+
+    /* mobile */
+    @media (max-width: 1024px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 60px 32px 80px;
+      }
+
+      .hero-slider {
+        margin: 40px auto 0;
+      }
+
+      .hero-title {
+        font-size: 48px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding: 40px 20px 60px;
+      }
+
+      .hero-title {
+        font-size: 38px;
+      }
+
+      .slider-card {
+        padding: 28px 24px 36px;
+      }
+
+      .case-link {
+        display: none; /* op mobiel kun je hem eventueel verbergen */
+      }
+    }
+  </style>
 </head>
-
 <body>
-
-<section class="hero">
-    <!-- LEFT SIDE -->
+  <section class="hero">
+    <!-- LINKERKANT -->
     <div>
-        <h1>
-            Stuurlui levert het<br>
-            allerbeste in<br>
-            WordPress
-        </h1>
+      <h1 class="hero-title">
+        Stuurlui levert het<br />
+        allerbeste in<br />
+        WordPress
+      </h1>
 
-        <p>
-            Met de ambitie om het meest klantvriendelijke WordPress bureau  
-            van Nederland te zijn.
-        </p>
+      <p class="hero-subtitle">
+        Met de ambitie om het meest klantvriendelijke WordPress bureau
+        van Nederland te zijn.
+      </p>
     </div>
 
-    <!-- RIGHT SIDE: CAROUSEL -->
-    <div class="carousel-wrapper">
+    <!-- RECHTERKANT: slider -->
+    <div class="hero-slider">
+      <div class="slider-card">
+        <!-- slides (5 stuks, met echte Stuurlui-afbeeldingen) -->
+        <a
+          href="https://stuurlui.nl/project/nieuwe-website-nlziet/"
+          class="slider-slide active"
+          data-index="0"
+          data-case-url="https://stuurlui.nl/project/nieuwe-website-nlziet/"
+        >
+          <img
+            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
+            alt="NLZIET case Stuurlui"
+          />
+        </a>
 
-        <!-- VUL HIER JOUW ECHTE AFBEELDINGEN IN -->
-        <img src="image1.png" class="slide active" alt="">
-        <img src="image2.png" class="slide" alt="">
-        <img src="image3.png" class="slide" alt="">
+        <a
+          href="https://stuurlui.nl/project/company-website-voor-de-action/"
+          class="slider-slide"
+          data-index="1"
+          data-case-url="https://stuurlui.nl/project/company-website-voor-de-action/"
+        >
+          <img
+            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
+            alt="Action case Stuurlui"
+          />
+        </a>
 
-        <div class="carousel-controls">
-            <button class="pause-btn" id="pauseBtn">❚❚</button>
+        <a
+          href="https://stuurlui.nl/project/heineken-dt-space-website/"
+          class="slider-slide"
+          data-index="2"
+          data-case-url="https://stuurlui.nl/project/heineken-dt-space-website/"
+        >
+          <img
+            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
+            alt="Heineken D&T Space case Stuurlui"
+          />
+        </a>
 
-            <div class="dots">
-                <div class="dot active"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
+        <a
+          href="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
+          class="slider-slide"
+          data-index="3"
+          data-case-url="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
+        >
+          <img
+            src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
+            alt="Haaglanden Medisch Centrum case Stuurlui"
+          />
+        </a>
+
+        <a
+          href="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
+          class="slider-slide"
+          data-index="4"
+          data-case-url="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
+        >
+          <img
+            src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
+            alt="LZV case Stuurlui"
+          />
+        </a>
+
+        <!-- 1 'Bekijk case' knop, wordt door JS steeds naar juiste URL gezet -->
+        <a href="#" class="case-link" id="caseLink">
+          Bekijk case <span>→</span>
+        </a>
+      </div>
+
+      <!-- Loader / controls -->
+      <div class="slider-controls">
+        <button
+          class="slider-playpause"
+          id="sliderPlayPause"
+          aria-label="Pauzeer slider"
+        >
+          <div class="slider-playpause-icon"></div>
+        </button>
+
+        <div class="slider-dots" id="sliderDots">
+          <!-- 5 bullets -->
+          <div class="slider-dot active" data-index="0"></div>
+          <div class="slider-dot" data-index="1"></div>
+          <div class="slider-dot" data-index="2"></div>
+          <div class="slider-dot" data-index="3"></div>
+          <div class="slider-dot" data-index="4"></div>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<script>
-    let index = 0;
+  <script>
+    const slides = document.querySelectorAll(".slider-slide");
+    const dots = document.querySelectorAll(".slider-dot");
+    const playPauseBtn = document.getElementById("sliderPlayPause");
+    const caseLink = document.getElementById("caseLink");
+
+    let currentIndex = 0;
     let paused = false;
+    const intervalMs = 4000;
 
-    const slides = document.querySelectorAll(".slide");
-    const dots = document.querySelectorAll(".dot");
-    const pauseBtn = document.getElementById("pauseBtn");
+    function setActiveSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
 
-    function showSlide(i) {
-        slides.forEach(s => s.classList.remove("active"));
-        dots.forEach(d => d.classList.remove("active"));
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
 
-        slides[i].classList.add("active");
-        dots[i].classList.add("active");
+      const activeSlide = slides[index];
+      const url = activeSlide.dataset.caseUrl;
+      caseLink.href = url;
+
+      currentIndex = index;
     }
 
     function nextSlide() {
-        if (!paused) {
-            index = (index + 1) % slides.length;
-            showSlide(index);
-        }
+      if (paused) return;
+      const next = (currentIndex + 1) % slides.length;
+      setActiveSlide(next);
     }
 
-    pauseBtn.addEventListener("click", () => {
-        paused = !paused;
-        pauseBtn.textContent = paused ? "▶" : "❚❚";
+    // autoplay
+    setInterval(nextSlide, intervalMs);
+
+    // dots klikbaar
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => {
+        const i = Number(dot.dataset.index);
+        setActiveSlide(i);
+      });
     });
 
-    setInterval(nextSlide, 3000);
-</script>
+    // play / pause
+    playPauseBtn.addEventListener("click", () => {
+      paused = !paused;
+      playPauseBtn.classList.toggle("paused", paused);
+    });
 
+    // initial link
+    setActiveSlide(0);
+  </script>
 </body>
 </html>
