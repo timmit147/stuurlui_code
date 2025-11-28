@@ -30,6 +30,7 @@
         sans-serif;
       background: var(--brand-bg);
       color: var(--brand-blue);
+      overflow-x: hidden; /* geen horizontale scrollbar */
     }
 
     /* ========= GRID (12 kolommen) ========= */
@@ -40,7 +41,7 @@
       padding: 80px 40px 120px;
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      column-gap: 32px;
+      column-gap: 64px;   /* extra ruimte tussen links & rechts */
       row-gap: 40px;
       align-items: flex-start;
     }
@@ -85,12 +86,15 @@
       margin-left: auto;
     }
 
-    /* Vierkant venster (altijd even breed/hoog) */
+    /* vierkant, 1 card per keer zichtbaar */
     .slider-window {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1;         /* altijd vierkant */
-      overflow: visible;           /* zodat afbeelding buiten kaart mag komen */
+      aspect-ratio: 1 / 1;
+      overflow: hidden; /* alleen huidige vierkant zichtbaar */
+      border-radius: 32px;
+      box-shadow: 0 26px 80px rgba(9, 23, 71, 0.16);
+      background: transparent;
     }
 
     .slider-track {
@@ -101,47 +105,47 @@
 
     .slider-card {
       position: relative;
-      min-width: 100%;
+      flex: 0 0 100%;
       height: 100%;
       border-radius: 32px;
-      padding: 32px;               /* alleen voor de knop binnenin */
-      box-shadow: 0 26px 80px rgba(9, 23, 71, 0.16);
+      padding: 32px;
       cursor: pointer;
-      overflow: visible;           /* beeld mag uitsteken */
+      overflow: hidden; /* card is het "vierkant" */
       opacity: 0.4;
-      transition: opacity 0.4s ease, transform 0.25s ease;
+      transition: opacity 0.4s ease;
     }
 
     .slider-card.active {
       opacity: 1;
     }
 
-    .slider-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 30px 90px rgba(9, 23, 71, 0.2);
-    }
-
+    /* achtergrond per slide */
     .slider-card:nth-child(1) { background: var(--card-bg-1); }
     .slider-card:nth-child(2) { background: var(--card-bg-2); }
     .slider-card:nth-child(3) { background: var(--card-bg-3); }
     .slider-card:nth-child(4) { background: var(--card-bg-4); }
     .slider-card:nth-child(5) { background: var(--card-bg-5); }
 
-    /* Afbeelding: absoluut en 20px boven + rechts buiten het vierkant */
+    /* afbeelding absoluut, maar binnen vierkant, met ruimte naar knop */
 
     .slide-media {
       position: absolute;
-      top: -20px;
-      right: -20px;
+      top: 20px;          /* 20px van bovenkant vierkant */
+      right: 20px;        /* 20px van rechterkant vierkant */
+      bottom: 96px;       /* ruimte boven knop (24px) + knophoogte (~40px) + 32px marge */
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
     }
 
     .slide-media img {
+      height: 100%;       /* maximaal tot boven de knop */
+      width: auto;
+      max-width: 120%;    /* iets breder mag */
       display: block;
-      max-width: 110%;
-      height: auto;
     }
 
-    /* Geen tekst-logo meer in de kaart, alleen knop */
+    /* knop onderin, kleurt bij hover card */
 
     .case-link {
       position: absolute;
@@ -157,11 +161,18 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .case-link span {
       font-size: 16px;
       transform: translateY(1px);
+    }
+
+    /* op hover van de hele card alleen knop-kleur veranderen */
+    .slider-card:hover .case-link {
+      background: var(--brand-blue);
+      color: #ffffff;
     }
 
     /* ========= CONTROLS & LOADER ========= */
@@ -171,6 +182,8 @@
       display: flex;
       align-items: center;
       gap: 18px;
+      position: relative;
+      z-index: 5; /* boven alles → goed klikbaar */
     }
 
     .slider-playpause {
@@ -254,7 +267,7 @@
 </head>
 <body>
 <section class="hero">
-  <!-- LINKERKANT (zonder logo’s) -->
+  <!-- LINKERKANT -->
   <div class="hero-left">
     <h1 class="hero-title">
       Stuurlui levert het<br />
@@ -275,10 +288,7 @@
     <div class="slider-window">
       <div class="slider-track" id="sliderTrack">
         <!-- Slide 1 – NLZIET -->
-        <article
-          class="slider-card active"
-          data-index="0"
-        >
+        <article class="slider-card active" data-index="0">
           <div class="slide-media">
             <img
               src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
@@ -296,10 +306,7 @@
         </article>
 
         <!-- Slide 2 – Action -->
-        <article
-          class="slider-card"
-          data-index="1"
-        >
+        <article class="slider-card" data-index="1">
           <div class="slide-media">
             <img
               src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
@@ -317,10 +324,7 @@
         </article>
 
         <!-- Slide 3 – Heineken -->
-        <article
-          class="slider-card"
-          data-index="2"
-        >
+        <article class="slider-card" data-index="2">
           <div class="slide-media">
             <img
               src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
@@ -338,10 +342,7 @@
         </article>
 
         <!-- Slide 4 – HMC -->
-        <article
-          class="slider-card"
-          data-index="3"
-        >
+        <article class="slider-card" data-index="3">
           <div class="slide-media">
             <img
               src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
@@ -359,10 +360,7 @@
         </article>
 
         <!-- Slide 5 – LZV -->
-        <article
-          class="slider-card"
-          data-index="4"
-        >
+        <article class="slider-card" data-index="4">
           <div class="slide-media">
             <img
               src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
@@ -423,16 +421,16 @@
 
   const slidesCount = realCards.length;
 
-  // clone van eerste card aan het eind → infinite loop
+  // infinite loop: clone eerste kaart aan het eind
   const firstClone = realCards[0].cloneNode(true);
   firstClone.classList.remove("active");
   track.appendChild(firstClone);
 
-  let positionIndex = 0;  // positie in track (0..slidesCount met clone)
-  let currentIndex  = 0;  // "echte" index (0..slidesCount-1)
+  let positionIndex = 0;  // positie in track (incl. clone)
+  let currentIndex  = 0;  // echte index (0..slidesCount-1)
   let userPaused = false;
   let hoverPaused = false;
-  let progress = 0;       // 0–1
+  let progress = 0;
   let lastTimestamp = null;
 
   function isPaused() {
@@ -477,15 +475,14 @@
     updateProgressBar();
   }
 
-  // als we op de clone staan → direct terugspringen naar echte eerste slide (zonder animatie)
+  // wanneer we op de clone komen → instant jump terug naar eerste
   track.addEventListener("transitionend", () => {
     if (positionIndex === slidesCount) {
       positionIndex = 0;
-      goToPosition(positionIndex, false); // geen animatie
+      goToPosition(positionIndex, false);
     }
   });
 
-  // loader
   function updateProgressBar() {
     dots.forEach((dot, i) => {
       const bar = dot.querySelector(".slider-dot-bar");
@@ -505,7 +502,7 @@
     });
   });
 
-  // play/pause knop
+  // play / pause
   playPauseBtn.addEventListener("click", () => {
     userPaused = !userPaused;
     playPauseBtn.textContent = userPaused ? "▶" : "❚❚";
@@ -519,7 +516,7 @@
     hoverPaused = false;
   });
 
-  // animatielus voor loader + autoplay
+  // animatielus
   function loop(timestamp) {
     if (lastTimestamp == null) lastTimestamp = timestamp;
     const dt = timestamp - lastTimestamp;
