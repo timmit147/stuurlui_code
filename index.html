@@ -13,11 +13,11 @@
       --accent-peach: #f6c58f;
       --dot-grey: #d4d9e4;
 
-      --card-bg-1: #ffe1e4;
-      --card-bg-2: #ffeec6;
-      --card-bg-3: #dfe9ff;
-      --card-bg-4: #efe5ff;
-      --card-bg-5: #d8e9ff; /* laatste slide nu blauw */
+      --card-bg-1: #ffe1e4; /* licht roze */
+      --card-bg-2: #fff1df; /* zacht oranje */
+      --card-bg-3: #e8f0ff; /* heel licht blauw */
+      --card-bg-4: #f1ecff; /* zacht paars */
+      --card-bg-5: #f7e5d8; /* licht oranje + beetje grijs */
     }
 
     * {
@@ -97,7 +97,7 @@
     .slider-track {
       display: flex;
       height: 100%;
-      transition: transform 0.7s ease;
+      transition: transform 1.1s ease-in-out; /* iets langzamer */
     }
 
     .slider-card {
@@ -109,6 +109,7 @@
       justify-content: center;
       opacity: 0.45;
       transition: opacity 0.4s ease;
+      cursor: pointer; /* hele square klikbaar */
     }
 
     .slider-card.active {
@@ -116,16 +117,17 @@
     }
 
     /* Inner square */
+
     .card-surface {
       position: relative;
-      width: calc(100% - 60px);           /* extra marge rechts/ boven */
+      width: calc(100% - 60px);
       height: calc(100% - 60px);
-      margin: 40px 40px 20px 20px;        /* top/right groter zodat image verder kan uitsteken */
+      margin: 40px 40px 20px 20px;
       border-radius: 32px;
-      border: 3px solid rgba(21, 42, 82, 0.18);
       overflow: visible;
       padding: 32px;
       z-index: 0;
+      /* neutrale pastel achtergrond per slide */
     }
 
     .slider-card:nth-child(1) .card-surface { background: var(--card-bg-1); }
@@ -134,18 +136,19 @@
     .slider-card:nth-child(4) .card-surface { background: var(--card-bg-4); }
     .slider-card:nth-child(5) .card-surface { background: var(--card-bg-5); }
 
-    /* ====== STATISCHE PATRONEN (GEEN HOVER-ANIMATIE MEER) ====== */
+    /* ====== alleen slide 1 heeft hover-animatie / tv static ====== */
+
     .card-surface::before {
       content: "";
       position: absolute;
-      inset: 4px;               /* binnen de rand */
+      inset: 4px;               /* binnen de vorm */
       border-radius: 28px;
-      opacity: 1;
+      opacity: 0;
       pointer-events: none;
       z-index: -1;
+      transition: opacity 0.25s ease;
     }
 
-    /* 1. NLZIET – tv static */
     .slider-card:nth-child(1) .card-surface::before {
       background-image:
         repeating-linear-gradient(
@@ -157,63 +160,27 @@
         );
       mix-blend-mode: soft-light;
       background-size: 100% 4px;
+      background-repeat: repeat-y;
     }
 
-    /* 2. Action – papier */
-    .slider-card:nth-child(2) .card-surface::before {
-      background-image:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,0.9), transparent 55%),
-        radial-gradient(circle at 80% 100%, rgba(255,220,200,0.6), transparent 60%),
-        repeating-linear-gradient(
-          135deg,
-          rgba(0,0,0,0.1) 0px,
-          rgba(0,0,0,0.1) 1.5px,
-          transparent 1.5px,
-          transparent 4px
-        );
-      mix-blend-mode: multiply;
+    .slider-card:nth-child(1) .card-surface:hover::before {
+      opacity: 0.9;
+      animation: tv-static 0.22s steps(6) infinite;
     }
 
-    /* 3. Heineken – space */
-    .slider-card:nth-child(3) .card-surface::before {
-      background-image:
-        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.85) 0, transparent 45%),
-        radial-gradient(circle at 90% 10%, rgba(133,205,255,0.8) 0, transparent 55%),
-        radial-gradient(circle at 0 100%, rgba(255,255,255,0.5) 0, transparent 60%),
-        linear-gradient(135deg, #020619, #132a5c);
-      mix-blend-mode: screen;
+    @keyframes tv-static {
+      0% { background-position-y: 0; }
+      100% { background-position-y: 16px; }
     }
 
-    /* 4. HMC – klinisch / grid */
-    .slider-card:nth-child(4) .card-surface::before {
-      background-image:
-        linear-gradient(135deg, rgba(255,255,255,1), rgba(211,238,255,0.95)),
-        repeating-linear-gradient(
-          90deg,
-          rgba(0,120,210,0.18) 0,
-          rgba(0,120,210,0.18) 2px,
-          transparent 2px,
-          transparent 10px
-        );
-      mix-blend-mode: screen;
-    }
+    /* geen extra hover-patterns meer op 2–5 */
 
-    /* 5. LZV – blauwe camo */
-    .slider-card:nth-child(5) .card-surface::before {
-      background-image:
-        radial-gradient(circle at 10% 20%, #4bb3ff 0, transparent 55%),
-        radial-gradient(circle at 60% 0, #00c4ff 0, transparent 55%),
-        radial-gradient(circle at 90% 70%, #005f99 0, transparent 55%),
-        radial-gradient(circle at 30% 80%, #00c49a 0, transparent 55%);
-      mix-blend-mode: soft-light;
-      background-size: 180px 160px, 200px 180px, 220px 200px, 190px 180px;
-    }
+    /* Afbeelding – 20px hoger & 20px meer naar rechts (steekt uit) */
 
-    /* Afbeelding – 20px hoger + 20px meer naar rechts dan vorige */
     .slide-media {
       position: absolute;
-      top: -40px;   /* was -20 of -30 → nu 20px hoger */
-      right: -40px; /* idem 20px meer naar rechts */
+      top: -40px;
+      right: -40px;
       bottom: 80px;
       display: flex;
       align-items: flex-start;
@@ -229,7 +196,8 @@
       display: block;
     }
 
-    /* Knop onderin, smooth hover */
+    /* Knop */
+
     .case-link {
       position: absolute;
       right: 24px;
@@ -261,14 +229,14 @@
     /* ========= CONTROLS & LOADER ========= */
 
     .slider-controls {
-      margin-top: 24px;
       display: flex;
       align-items: center;
       gap: 18px;
       position: relative;
       z-index: 5;
-      max-width: 540px;   /* zelfde als slider */
-      margin-left: auto;  /* uitlijnen onder vierkant */
+      max-width: 540px;
+      margin-left: 20px; /* volgens jouw wens */
+      margin-top: 0;     /* geen marge boven */
     }
 
     .slider-playpause {
@@ -323,6 +291,7 @@
       .hero {
         grid-template-columns: repeat(6, minmax(0, 1fr));
         padding: 60px 24px 80px;
+        row-gap: 24px; /* minder ruimte tussen tekst en slider */
       }
 
       .hero-left {
@@ -331,7 +300,15 @@
 
       .hero-right {
         grid-column: 1 / -1;
-        margin-top: 40px;
+        margin-top: 16px;        /* minder gap */
+      }
+
+      .hero-slider {
+        margin-left: 0;          /* slider links uitlijnen */
+      }
+
+      .slider-controls {
+        margin-left: 0;          /* controls ook links */
       }
 
       .hero-title {
@@ -547,7 +524,7 @@
     if (!animated) {
       track.style.transition = "none";
     } else {
-      track.style.transition = "transform 0.7s ease";
+      track.style.transition = "transform 1.1s ease-in-out";
     }
     track.style.transform = `translateX(-${pos * 100}%)`;
   }
