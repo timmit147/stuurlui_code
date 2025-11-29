@@ -127,15 +127,17 @@
       z-index: 0;
     }
 
-    .slider-card:nth-child(1) .card-surface { background: var(--card-bg-1); }
-    .slider-card:nth-child(2) .card-surface { background: var(--card-bg-2); }
-    .slider-card:nth-child(3) .card-surface { background: var(--card-bg-3); }
-    .slider-card:nth-child(4) .card-surface { background: var(--card-bg-4); }
-    .slider-card:nth-child(5) .card-surface { background: var(--card-bg-5); }
+    /* neutrale pastel achtergronden op basis van data-case */
 
-    /* Alleen slide 1 heeft hover-ruis */
+    .slider-card[data-case="nlziet"]   .card-surface { background: var(--card-bg-1); }
+    .slider-card[data-case="action"]   .card-surface { background: var(--card-bg-2); }
+    .slider-card[data-case="heineken"] .card-surface { background: var(--card-bg-3); }
+    .slider-card[data-case="hmc"]      .card-surface { background: var(--card-bg-4); }
+    .slider-card[data-case="lzv"]      .card-surface { background: var(--card-bg-5); }
 
-    .card-surface::before {
+    /* ====== alleen eerste case (nlziet) heeft hover static ====== */
+
+    .slider-card[data-case="nlziet"] .card-surface::before {
       content: "";
       position: absolute;
       inset: 4px;
@@ -144,9 +146,6 @@
       pointer-events: none;
       z-index: -1;
       transition: opacity 0.25s ease;
-    }
-
-    .slider-card:nth-child(1) .card-surface::before {
       background-image:
         repeating-linear-gradient(
           0deg,
@@ -160,7 +159,7 @@
       background-repeat: repeat-y;
     }
 
-    .slider-card:nth-child(1) .card-surface:hover::before {
+    .slider-card[data-case="nlziet"] .card-surface:hover::before {
       opacity: 0.9;
       animation: tv-static 0.22s steps(6) infinite;
     }
@@ -347,7 +346,7 @@
     <div class="slider-window">
       <div class="slider-track" id="sliderTrack">
         <!-- Slide 0 – NLZIET -->
-        <article class="slider-card active" data-index="0">
+        <article class="slider-card active" data-index="0" data-case="nlziet">
           <div class="card-surface">
             <div class="slide-media">
               <img
@@ -367,7 +366,7 @@
         </article>
 
         <!-- Slide 1 – Action -->
-        <article class="slider-card" data-index="1">
+        <article class="slider-card" data-index="1" data-case="action">
           <div class="card-surface">
             <div class="slide-media">
               <img
@@ -387,7 +386,7 @@
         </article>
 
         <!-- Slide 2 – Heineken -->
-        <article class="slider-card" data-index="2">
+        <article class="slider-card" data-index="2" data-case="heineken">
           <div class="card-surface">
             <div class="slide-media">
               <img
@@ -407,7 +406,7 @@
         </article>
 
         <!-- Slide 3 – HMC -->
-        <article class="slider-card" data-index="3">
+        <article class="slider-card" data-index="3" data-case="hmc">
           <div class="card-surface">
             <div class="slide-media">
               <img
@@ -427,7 +426,7 @@
         </article>
 
         <!-- Slide 4 – LZV -->
-        <article class="slider-card" data-index="4">
+        <article class="slider-card" data-index="4" data-case="lzv">
           <div class="card-surface">
             <div class="slide-media">
               <img
@@ -483,31 +482,49 @@
   const SLIDE_DURATION = 5000; // ms
 
   const track = document.getElementById("sliderTrack");
-  const realCards = Array.from(track.querySelectorAll(".slider-card"));
+  const originalSlides = Array.from(track.querySelectorAll(".slider-card[data-index]"));
   const dots = document.querySelectorAll(".slider-dot");
   const playPauseBtn = document.getElementById("sliderPlayPause");
   const heroSlider = document.getElementById("heroSlider");
 
-  const slidesCount = realCards.length; // 5 echte slides
+  const slidesCount = originalSlides.length; // 5 echte slides
 
-  let currentIndex = 0;  // logisch: 0..slidesCount-1
+  // === CLONES VOOR ECHT INFINITE EFFECT ===
+  const firstReal = originalSlides[0];
+  const lastReal = originalSlides[slidesCount - 1];
+
+  const firstClone = firstReal.cloneNode(true);
+  const lastClone = lastReal.cloneNode(true);
+  firstClone.classList.remove("active");
+  lastClone.classList.remove("active");
+
+  track.insertBefore(lastClone, firstReal); // [cloneLast, slide0, slide1, ..., slide4]
+  track.appendChild(firstClone);            // [..., slide4, cloneFirst]
+
+  // positie in de track (incl. clones)
+  let positionIndex = 1;  // 0 = cloneLast, 1 = slide0, ..., slidesCount = slide4, slidesCount+1 = cloneFirst
+  let currentIndex  = 0;  // logisch: 0..slidesCount-1
   let userPaused = false;
   let hoverPaused = false;
   let progress = 0;
   let lastTimestamp = null;
-  let isSliding = false;
 
   function isPaused() {
-    return userPaused || hoverPaused || isSliding;
+    return userPaused || hoverPaused;
   }
 
   function applyActive() {
-    realCards.forEach((card, i) => {
+    originalSlides.forEach((card, i) => {
       card.classList.toggle("active", i === currentIndex);
     });
     dots.forEach((dot, i) => {
       dot.classList.toggle("active", i === currentIndex);
     });
+  }
+
+  function updateTransform(animated = true) {
+    track.style.transition = animated ? "transform 1.1s ease-in-out" : "none";
+    track.style.transform = `translateX(-${positionIndex * 100}%)`;
   }
 
   function updateProgressBar() {
@@ -521,70 +538,57 @@
     });
   }
 
-  // logische volgende slide – visueel infinite via DOM-rotatie
   function nextSlide() {
-    if (isSliding) return;
-    isSliding = true;
-
-    // animatie naar links
-    track.style.transition = "transform 1.1s ease-in-out";
-    track.style.transform = "translateX(-100%)";
-
-    // logische index vooruit
+    positionIndex += 1;
+    // logische index vooruit (0..4)
     currentIndex = (currentIndex + 1) % slidesCount;
     progress = 0;
     lastTimestamp = null;
     applyActive();
+    updateTransform(true);
     updateProgressBar();
   }
 
-  // na animatie: eerste child naar achteren, transform resetten
+  // Infinite reset bij clones
   track.addEventListener("transitionend", (e) => {
     if (e.target !== track) return;
-    // verplaats eerste slide naar het einde
-    track.appendChild(track.firstElementChild);
 
-    // reset positie zonder animatie
-    track.style.transition = "none";
-    track.style.transform = "translateX(0)";
+    if (positionIndex === slidesCount + 1) {
+      // we staan op cloneFirst → instant terug naar echte eerste slide
+      track.style.transition = "none";
+      positionIndex = 1;
+      track.style.transform = `translateX(-${positionIndex * 100}%)`;
 
-    requestAnimationFrame(() => {
-      track.style.transition = "transform 1.1s ease-in-out";
-      isSliding = false;
-    });
+      // volgende animatie weer normaal
+      requestAnimationFrame(() => {
+        track.style.transition = "transform 1.1s ease-in-out";
+      });
+    } else if (positionIndex === 0) {
+      // (alleen nodig als je ooit prev zou doen)
+      track.style.transition = "none";
+      positionIndex = slidesCount;
+      track.style.transform = `translateX(-${positionIndex * 100}%)`;
+      requestAnimationFrame(() => {
+        track.style.transition = "transform 1.1s ease-in-out";
+      });
+    }
   });
 
-  // dots: jump direct naar slide, zonder animatie, en DOM ordenen
-  function jumpToIndex(idx) {
-    if (idx === currentIndex) return;
-
-    // stop lopende animatie
-    isSliding = false;
-    track.style.transition = "none";
-    track.style.transform = "translateX(0)";
-
-    // roteer DOM totdat de eerste child de gewenste slide is
-    const targetNode = realCards[idx];
-    while (track.firstElementChild !== targetNode) {
-      track.appendChild(track.firstElementChild);
-    }
-
-    currentIndex = idx;
+  // dots → ga naar specifieke slide
+  function setSlide(index) {
+    currentIndex = index;
+    positionIndex = index + 1; // map naar track-index
     progress = 0;
     lastTimestamp = null;
     applyActive();
+    updateTransform(true);
     updateProgressBar();
-
-    // transition weer aanzetten voor volgende automatische slide
-    requestAnimationFrame(() => {
-      track.style.transition = "transform 1.1s ease-in-out";
-    });
   }
 
   dots.forEach((dot) => {
     dot.addEventListener("click", () => {
       const idx = Number(dot.dataset.index);
-      jumpToIndex(idx);
+      setSlide(idx);
     });
   });
 
@@ -602,7 +606,7 @@
     hoverPaused = false;
   });
 
-  // autoplay loop
+  // animatielus
   function loop(timestamp) {
     if (lastTimestamp == null) lastTimestamp = timestamp;
     const dt = timestamp - lastTimestamp;
@@ -622,7 +626,7 @@
 
   // init
   applyActive();
-  track.style.transform = "translateX(0)";
+  updateTransform(false); // start op echte slide0 (index 1 in track)
   requestAnimationFrame(loop);
 </script>
 </body>
