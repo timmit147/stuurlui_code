@@ -108,7 +108,6 @@
       align-items: stretch;
       justify-content: center;
       cursor: pointer; /* hele square klikbaar */
-      /* geen opacity verschillen meer → clones vallen niet op */
     }
 
     .card-surface {
@@ -484,21 +483,20 @@
 
   const slidesCount = originalSlides.length; // 5
 
-  // === CLONES voor echt infinite slide → clone → snap terug ===
+  // === CLONES voor infinite effect ===
   const firstReal = originalSlides[0];
   const lastReal = originalSlides[slidesCount - 1];
 
   const firstClone = firstReal.cloneNode(true);
   const lastClone = lastReal.cloneNode(true);
 
-  track.insertBefore(lastClone, firstReal); // [cloneLast, slide0, slide1, ..., slide4]
+  track.insertBefore(lastClone, firstReal); // [cloneLast, slide0..]
   track.appendChild(firstClone);            // [..., slide4, cloneFirst]
 
   // index in track (incl. clones)
-  // 0 = cloneLast, 1 = slide0, 2 = slide1, ..., slidesCount = slide4, slidesCount+1 = cloneFirst
+  // 0 = cloneLast, 1 = slide0, ..., slidesCount = slide4, slidesCount+1 = cloneFirst
   let positionIndex = 1;  // start op echte slide0
-  let currentIndex  = 0;  // logische index 0..4
-
+  let currentIndex  = 0;  // logisch 0..4
   let userPaused = false;
   let hoverPaused = false;
   let progress = 0;
@@ -531,39 +529,41 @@
   }
 
   function nextSlide() {
-    positionIndex += 1;               // altijd één stap vooruit in track
-    currentIndex = (currentIndex + 1) % slidesCount; // logische index 0..4
+    positionIndex += 1;                        // altijd naar volgende positie in track
+    currentIndex = (currentIndex + 1) % slidesCount; // logische index vooruit
     progress = 0;
     lastTimestamp = null;
-
     applyActiveDots();
     updateTransform(true);
     updateProgressBar();
   }
 
-  // Na animatie: als we op cloneFirst staan → instant terug naar echte eerste slide (zelfde positie)
+  // Reset na animatie als we op een clone zitten
   track.addEventListener("transitionend", (e) => {
-    if (e.target !== track) return;
+    // we willen alleen reageren op de transform-transition van de track zelf
+    if (e.target !== track || e.propertyName !== "transform") return;
 
+    // op cloneFirst aangekomen? (visueel 6e slide)
     if (positionIndex === slidesCount + 1) {
-      // we staan visueel op cloneFirst → snap naar echte slide0
+      // 1) transition uit → geen animatie
       track.style.transition = "none";
-      positionIndex = 1; // echte slide0
+
+      // 2) intern terug naar echte eerste slide
+      positionIndex = 1;
       track.style.transform = `translateX(-${positionIndex * 100}%)`;
 
-      // transition weer aanzetten voor volgende keer
-      requestAnimationFrame(() => {
-        track.style.transition = "transform 1.1s ease-in-out";
-      });
-    }
+      // 3) reflow forceren zodat browser dit als eindstand ziet
+      void track.offsetWidth;
 
-    // (optioneel: als je ooit prev doet, kun je hier ook cloneLast afhandelen)
+      // 4) transition weer aanzetten voor volgende slides
+      track.style.transition = "transform 1.1s ease-in-out";
+    }
   });
 
-  // dots → direct naar specifieke slide
+  // dots → direct naar een specifieke slide
   function setSlide(index) {
     currentIndex = index;
-    positionIndex = index + 1; // map naar track-index (1..slidesCount)
+    positionIndex = index + 1; // 0 → 1, 1 → 2, ...
     progress = 0;
     lastTimestamp = null;
     applyActiveDots();
@@ -612,7 +612,7 @@
 
   // init
   applyActiveDots();
-  updateTransform(false); // start direct op echte slide0 (index 1 in track)
+  updateTransform(false); // start netjes op slide0
   requestAnimationFrame(loop);
 </script>
 </body>
