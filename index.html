@@ -482,28 +482,14 @@
   const SLIDE_DURATION = 5000; // ms
 
   const track = document.getElementById("sliderTrack");
-  const originalSlides = Array.from(track.querySelectorAll(".slider-card[data-index]"));
+  const slides = Array.from(track.querySelectorAll(".slider-card"));
   const dots = document.querySelectorAll(".slider-dot");
   const playPauseBtn = document.getElementById("sliderPlayPause");
   const heroSlider = document.getElementById("heroSlider");
 
-  const slidesCount = originalSlides.length; // 5 echte slides
+  const slidesCount = slides.length; // 5
 
-  // === CLONES VOOR ECHT INFINITE EFFECT ===
-  const firstReal = originalSlides[0];
-  const lastReal = originalSlides[slidesCount - 1];
-
-  const firstClone = firstReal.cloneNode(true);
-  const lastClone = lastReal.cloneNode(true);
-  firstClone.classList.remove("active");
-  lastClone.classList.remove("active");
-
-  track.insertBefore(lastClone, firstReal); // [cloneLast, slide0, slide1, ..., slide4]
-  track.appendChild(firstClone);            // [..., slide4, cloneFirst]
-
-  // positie in de track (incl. clones)
-  let positionIndex = 1;  // 0 = cloneLast, 1 = slide0, ..., slidesCount = slide4, slidesCount+1 = cloneFirst
-  let currentIndex  = 0;  // logisch: 0..slidesCount-1
+  let currentIndex = 0;  // 0..4
   let userPaused = false;
   let hoverPaused = false;
   let progress = 0;
@@ -514,7 +500,7 @@
   }
 
   function applyActive() {
-    originalSlides.forEach((card, i) => {
+    slides.forEach((card, i) => {
       card.classList.toggle("active", i === currentIndex);
     });
     dots.forEach((dot, i) => {
@@ -524,7 +510,7 @@
 
   function updateTransform(animated = true) {
     track.style.transition = animated ? "transform 1.1s ease-in-out" : "none";
-    track.style.transform = `translateX(-${positionIndex * 100}%)`;
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
   }
 
   function updateProgressBar() {
@@ -539,45 +525,22 @@
   }
 
   function nextSlide() {
-    positionIndex += 1;
-    // logische index vooruit (0..4)
-    currentIndex = (currentIndex + 1) % slidesCount;
+    const nextIndex = (currentIndex + 1) % slidesCount;
+    const wrapAround = nextIndex === 0; // van laatste terug naar eerste
+
+    currentIndex = nextIndex;
     progress = 0;
     lastTimestamp = null;
     applyActive();
-    updateTransform(true);
+
+    // als we wrap-around doen → geen animatie, direct naar de eerste
+    updateTransform(!wrapAround);
     updateProgressBar();
   }
-
-  // Infinite reset bij clones
-  track.addEventListener("transitionend", (e) => {
-    if (e.target !== track) return;
-
-    if (positionIndex === slidesCount + 1) {
-      // we staan op cloneFirst → instant terug naar echte eerste slide
-      track.style.transition = "none";
-      positionIndex = 1;
-      track.style.transform = `translateX(-${positionIndex * 100}%)`;
-
-      // volgende animatie weer normaal
-      requestAnimationFrame(() => {
-        track.style.transition = "transform 1.1s ease-in-out";
-      });
-    } else if (positionIndex === 0) {
-      // (alleen nodig als je ooit prev zou doen)
-      track.style.transition = "none";
-      positionIndex = slidesCount;
-      track.style.transform = `translateX(-${positionIndex * 100}%)`;
-      requestAnimationFrame(() => {
-        track.style.transition = "transform 1.1s ease-in-out";
-      });
-    }
-  });
 
   // dots → ga naar specifieke slide
   function setSlide(index) {
     currentIndex = index;
-    positionIndex = index + 1; // map naar track-index
     progress = 0;
     lastTimestamp = null;
     applyActive();
@@ -626,7 +589,7 @@
 
   // init
   applyActive();
-  updateTransform(false); // start op echte slide0 (index 1 in track)
+  updateTransform(false); // start op slide 0 zonder animatie
   requestAnimationFrame(loop);
 </script>
 </body>
