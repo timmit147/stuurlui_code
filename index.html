@@ -107,13 +107,8 @@
       display: flex;
       align-items: stretch;
       justify-content: center;
-      opacity: 0.45;
-      transition: opacity 0.4s ease;
-      cursor: pointer;
-    }
-
-    .slider-card.active {
-      opacity: 1;
+      cursor: pointer; /* hele square klikbaar */
+      /* geen opacity verschillen meer → clones vallen niet op */
     }
 
     .card-surface {
@@ -346,7 +341,7 @@
     <div class="slider-window">
       <div class="slider-track" id="sliderTrack">
         <!-- Slide 0 – NLZIET -->
-        <article class="slider-card active" data-index="0" data-case="nlziet">
+        <article class="slider-card" data-index="0" data-case="nlziet">
           <div class="card-surface">
             <div class="slide-media">
               <img
@@ -482,14 +477,28 @@
   const SLIDE_DURATION = 5000; // ms
 
   const track = document.getElementById("sliderTrack");
-  const slides = Array.from(track.querySelectorAll(".slider-card"));
+  const originalSlides = Array.from(track.querySelectorAll(".slider-card[data-index]"));
   const dots = document.querySelectorAll(".slider-dot");
   const playPauseBtn = document.getElementById("sliderPlayPause");
   const heroSlider = document.getElementById("heroSlider");
 
-  const slidesCount = slides.length; // 5
+  const slidesCount = originalSlides.length; // 5
 
-  let currentIndex = 0;  // 0..4
+  // === CLONES voor echt infinite slide → clone → snap terug ===
+  const firstReal = originalSlides[0];
+  const lastReal = originalSlides[slidesCount - 1];
+
+  const firstClone = firstReal.cloneNode(true);
+  const lastClone = lastReal.cloneNode(true);
+
+  track.insertBefore(lastClone, firstReal); // [cloneLast, slide0, slide1, ..., slide4]
+  track.appendChild(firstClone);            // [..., slide4, cloneFirst]
+
+  // index in track (incl. clones)
+  // 0 = cloneLast, 1 = slide0, 2 = slide1, ..., slidesCount = slide4, slidesCount+1 = cloneFirst
+  let positionIndex = 1;  // start op echte slide0
+  let currentIndex  = 0;  // logische index 0..4
+
   let userPaused = false;
   let hoverPaused = false;
   let progress = 0;
@@ -499,10 +508,7 @@
     return userPaused || hoverPaused;
   }
 
-  function applyActive() {
-    slides.forEach((card, i) => {
-      card.classList.toggle("active", i === currentIndex);
-    });
+  function applyActiveDots() {
     dots.forEach((dot, i) => {
       dot.classList.toggle("active", i === currentIndex);
     });
@@ -510,7 +516,7 @@
 
   function updateTransform(animated = true) {
     track.style.transition = animated ? "transform 1.1s ease-in-out" : "none";
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    track.style.transform = `translateX(-${positionIndex * 100}%)`;
   }
 
   function updateProgressBar() {
@@ -525,25 +531,42 @@
   }
 
   function nextSlide() {
-    const nextIndex = (currentIndex + 1) % slidesCount;
-    const wrapAround = nextIndex === 0; // van laatste terug naar eerste
-
-    currentIndex = nextIndex;
+    positionIndex += 1;               // altijd één stap vooruit in track
+    currentIndex = (currentIndex + 1) % slidesCount; // logische index 0..4
     progress = 0;
     lastTimestamp = null;
-    applyActive();
 
-    // als we wrap-around doen → geen animatie, direct naar de eerste
-    updateTransform(!wrapAround);
+    applyActiveDots();
+    updateTransform(true);
     updateProgressBar();
   }
 
-  // dots → ga naar specifieke slide
+  // Na animatie: als we op cloneFirst staan → instant terug naar echte eerste slide (zelfde positie)
+  track.addEventListener("transitionend", (e) => {
+    if (e.target !== track) return;
+
+    if (positionIndex === slidesCount + 1) {
+      // we staan visueel op cloneFirst → snap naar echte slide0
+      track.style.transition = "none";
+      positionIndex = 1; // echte slide0
+      track.style.transform = `translateX(-${positionIndex * 100}%)`;
+
+      // transition weer aanzetten voor volgende keer
+      requestAnimationFrame(() => {
+        track.style.transition = "transform 1.1s ease-in-out";
+      });
+    }
+
+    // (optioneel: als je ooit prev doet, kun je hier ook cloneLast afhandelen)
+  });
+
+  // dots → direct naar specifieke slide
   function setSlide(index) {
     currentIndex = index;
+    positionIndex = index + 1; // map naar track-index (1..slidesCount)
     progress = 0;
     lastTimestamp = null;
-    applyActive();
+    applyActiveDots();
     updateTransform(true);
     updateProgressBar();
   }
@@ -569,7 +592,7 @@
     hoverPaused = false;
   });
 
-  // animatielus
+  // autoplay loop
   function loop(timestamp) {
     if (lastTimestamp == null) lastTimestamp = timestamp;
     const dt = timestamp - lastTimestamp;
@@ -588,8 +611,8 @@
   }
 
   // init
-  applyActive();
-  updateTransform(false); // start op slide 0 zonder animatie
+  applyActiveDots();
+  updateTransform(false); // start direct op echte slide0 (index 1 in track)
   requestAnimationFrame(loop);
 </script>
 </body>
