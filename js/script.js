@@ -185,12 +185,18 @@ class HeroSlider {
   }
 
   handleKeydown(event) {
-    if (event.key === "ArrowRight") {
+    const key = event.key;
+
+    if (key === "ArrowRight") {
       event.preventDefault();
       this.goToNextSlide();
-    } else if (event.key === "ArrowLeft") {
+    } else if (key === "ArrowLeft") {
       event.preventDefault();
       this.goToPreviousSlide();
+    } else if (key === " " || key === "Spacebar") {
+      // Space toggles play/pause when slider has focus
+      event.preventDefault();
+      this.toggleUserPaused();
     }
   }
 
@@ -250,7 +256,7 @@ class HeroSlider {
       this.hoverPaused = false;
     });
 
-    // Arrow navigation when slider has focus
+    // Arrow + Space navigation when slider has focus
     this.root.addEventListener("keydown", (event) =>
       this.handleKeydown(event)
     );
