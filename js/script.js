@@ -30,6 +30,8 @@ class HeroSlider {
     this.pointerStartX = null;
     this.pointerActive = false;
 
+    this.isAnimating = false;
+
     this.setupClones();
     this.attachEvents();
     this.updateDotsAndBars();
@@ -78,29 +80,44 @@ class HeroSlider {
   }
 
   goToSlide(index, animated = true) {
+    if (animated && this.isAnimating) return;
+
     this.logicalSlideIndex = index;
     this.trackPositionIndex = index + 1;
     this.progress = 0;
     this.lastTimestamp = null;
+
+    if (animated) {
+      this.isAnimating = true;
+    }
+
     this.updateDotsAndBars();
     this.updateTransform(animated);
   }
 
   goToNextSlide() {
+    if (this.isAnimating) return;
+
     this.trackPositionIndex += 1;
     this.logicalSlideIndex = (this.logicalSlideIndex + 1) % this.slideCount;
     this.progress = 0;
     this.lastTimestamp = null;
+    this.isAnimating = true;
+
     this.updateDotsAndBars();
     this.updateTransform(true);
   }
 
   goToPreviousSlide() {
+    if (this.isAnimating) return;
+
     this.trackPositionIndex -= 1;
     this.logicalSlideIndex =
       (this.logicalSlideIndex - 1 + this.slideCount) % this.slideCount;
     this.progress = 0;
     this.lastTimestamp = null;
+    this.isAnimating = true;
+
     this.updateDotsAndBars();
     this.updateTransform(true);
   }
@@ -129,6 +146,8 @@ class HeroSlider {
       void this.track.offsetWidth;
       this.track.style.transition = "transform 1.1s ease-in-out";
     }
+
+    this.isAnimating = false;
   }
 
   toggleUserPaused() {
@@ -233,7 +252,7 @@ class HeroSlider {
     const deltaTime = timestamp - this.lastTimestamp;
     this.lastTimestamp = timestamp;
 
-    if (!this.isPaused()) {
+    if (!this.isPaused() && !this.isAnimating) {
       this.progress += deltaTime / this.duration;
       if (this.progress >= 1) {
         this.progress = 0;
