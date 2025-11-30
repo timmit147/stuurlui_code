@@ -71,30 +71,12 @@ function goToNextSlide() {
   updateTransform(true);
 }
 
-function goToPreviousSlide() {
-  trackPositionIndex -= 1;
-  logicalSlideIndex = (logicalSlideIndex - 1 + slideCount) % slideCount;
-  progress = 0;
-  lastTimestamp = null;
-
-  updateDotsAndBars();
-  updateTransform(true);
-}
-
 function handleTransitionEnd(event) {
   if (event.target !== trackElement || event.propertyName !== "transform") return;
 
   if (trackPositionIndex === slideCount + 1) {
     trackElement.style.transition = "none";
     trackPositionIndex = 1;
-    trackElement.style.transform = `translateX(-${trackPositionIndex * 100}%)`;
-    void trackElement.offsetWidth;
-    trackElement.style.transition = "transform 1.1s ease-in-out";
-  }
-
-  if (trackPositionIndex === 0) {
-    trackElement.style.transition = "none";
-    trackPositionIndex = slideCount;
     trackElement.style.transform = `translateX(-${trackPositionIndex * 100}%)`;
     void trackElement.offsetWidth;
     trackElement.style.transition = "transform 1.1s ease-in-out";
@@ -109,15 +91,6 @@ function attachEvents() {
       const index = Number(dot.dataset.index);
       goToSlide(index);
     });
-
-    dot.addEventListener("keydown", (event) => {
-      const key = event.key;
-      if (key === "Enter" || key === " " || key === "Spacebar") {
-        event.preventDefault();
-        const index = Number(dot.dataset.index);
-        goToSlide(index);
-      }
-    });
   });
 
   playPauseButton.addEventListener("click", () => {
@@ -131,16 +104,6 @@ function attachEvents() {
 
   sliderElement.addEventListener("mouseleave", () => {
     hoverPaused = false;
-  });
-
-  sliderElement.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      goToNextSlide();
-    } else if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      goToPreviousSlide();
-    }
   });
 }
 
