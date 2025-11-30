@@ -10,11 +10,11 @@ class HeroSlider {
     this.dots = Array.from(
       this.root.querySelectorAll(".slider-dot[data-index]")
     );
-    this.playPauseButton = document.getElementById("sliderPlayPause");
+    this.playPauseButton = this.root.querySelector(".slider-playpause");
+    this.playPauseIcon = this.root.querySelector(".slider-playpause-icon");
     this.sliderWindow = this.root.querySelector(".slider-window");
     this.caseLinks = Array.from(this.root.querySelectorAll(".case-link"));
 
-    // Make all "Bekijk case" links NOT tabbable
     this.caseLinks.forEach((link) => {
       link.tabIndex = -1;
     });
@@ -161,13 +161,14 @@ class HeroSlider {
   }
 
   updatePlayPauseVisual() {
-    if (!this.playPauseButton) return;
+    if (!this.playPauseButton || !this.playPauseIcon) return;
+
     if (this.userPaused) {
-      this.playPauseButton.textContent = "▶";
+      this.playPauseIcon.textContent = "▶";
       this.playPauseButton.setAttribute("aria-pressed", "true");
       this.playPauseButton.setAttribute("aria-label", "Start slider");
     } else {
-      this.playPauseButton.textContent = "❚❚";
+      this.playPauseIcon.textContent = "❚❚";
       this.playPauseButton.setAttribute("aria-pressed", "false");
       this.playPauseButton.setAttribute("aria-label", "Pauzeer slider");
     }
@@ -190,7 +191,6 @@ class HeroSlider {
       event.preventDefault();
       this.goToPreviousSlide();
     } else if (key === " " || key === "Spacebar") {
-      // Space toggles play/pause when slider has focus
       event.preventDefault();
       this.toggleUserPaused();
     }
@@ -221,16 +221,12 @@ class HeroSlider {
       this.handleTransitionEnd(e)
     );
 
-    // Whole slide clickable (including clones)
     this.track.addEventListener("click", (event) => {
       const card = event.target.closest(".slider-card");
       if (!card) return;
       const link = card.querySelector(".case-link");
       if (!link) return;
-
-      // If you actually clicked the link, let the browser handle it
       if (event.target.closest("a")) return;
-
       link.click();
     });
 
@@ -252,7 +248,6 @@ class HeroSlider {
       this.hoverPaused = false;
     });
 
-    // Arrow + Space navigation when slider has focus
     this.root.addEventListener("keydown", (event) =>
       this.handleKeydown(event)
     );

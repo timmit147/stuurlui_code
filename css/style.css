@@ -29,8 +29,6 @@ main {
   min-height: 100vh;
 }
 
-/* HERO */
-
 .hero {
   max-width: 1440px;
   margin: 0 auto;
@@ -73,8 +71,6 @@ main {
   max-width: 520px;
   margin: 0 0 32px;
 }
-
-/* SLIDER */
 
 .hero-slider {
   position: relative;
@@ -137,8 +133,6 @@ main {
 .slider-card[data-case="lzv"] .card-surface {
   background: var(--card-bg-5);
 }
-
-/* NLZIET static effect */
 
 .slider-card[data-case="nlziet"] .card-surface::before {
   content: "";
@@ -222,8 +216,6 @@ main {
   color: #ffffff;
 }
 
-/* CONTROLS */
-
 .slider-controls {
   display: flex;
   align-items: center;
@@ -246,6 +238,11 @@ main {
   justify-content: center;
   cursor: pointer;
   padding: 0;
+}
+
+.slider-playpause-icon {
+  display: block;
+  line-height: 1;
   font-size: 18px;
 }
 
@@ -281,8 +278,6 @@ main {
   width: 58px;
 }
 
-/* RESPONSIVE */
-
 @media (max-width: 1024px) {
   .hero {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -316,8 +311,6 @@ main {
     font-size: 34px;
   }
 }
-
-/* REDUCED MOTION */
 
 @media (prefers-reduced-motion: reduce) {
   .slider-track {
