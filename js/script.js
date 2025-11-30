@@ -28,30 +28,37 @@ let hoverPaused = false;
 let progress = 0;
 let lastTimestamp = null;
 
-function isSliderPaused() {
+function isPaused() {
   return userPaused || hoverPaused;
 }
 
-function setActiveDots() {
+function updateDotsAndBars() {
   dots.forEach((dot, index) => {
-    dot.classList.toggle("active", index === logicalSlideIndex);
-  });
-}
+    const isActive = index === logicalSlideIndex;
+    dot.classList.toggle("active", isActive);
 
-function updateSliderTransform(animated = true) {
-  trackElement.style.transition = animated ? "transform 1.1s ease-in-out" : "none";
-  trackElement.style.transform = `translateX(-${trackPositionIndex * 100}%)`;
-}
-
-function updateProgressBars() {
-  dots.forEach((dot, index) => {
     const bar = dot.querySelector(".slider-dot-bar");
-    if (index === logicalSlideIndex) {
+    if (isActive) {
       bar.style.width = (progress * 100).toFixed(2) + "%";
     } else {
       bar.style.width = "0%";
     }
   });
+}
+
+function updateTransform(animated = true) {
+  trackElement.style.transition = animated ? "transform 1.1s ease-in-out" : "none";
+  trackElement.style.transform = `translateX(-${trackPositionIndex * 100}%)`;
+}
+
+function goToSlide(index, animated = true) {
+  logicalSlideIndex = index;
+  trackPositionIndex = index + 1;
+  progress = 0;
+  lastTimestamp = null;
+
+  updateDotsAndBars();
+  updateTransform(animated);
 }
 
 function goToNextSlide() {
@@ -60,16 +67,12 @@ function goToNextSlide() {
   progress = 0;
   lastTimestamp = null;
 
-  setActiveDots();
-  updateSliderTransform(true);
-  updateProgressBars();
+  updateDotsAndBars();
+  updateTransform(true);
 }
 
-trackElement.addEventListener("transitionend", (event) => {
-  const isTransformTransition =
-    event.target === trackElement && event.propertyName === "transform";
-
-  if (!isTransformTransition) return;
+function handleTransitionEnd(event) {
+  if (event.target !== trackElement || event.propertyName !== "transform") return;
 
   if (trackPositionIndex === slideCount + 1) {
     trackElement.style.transition = "none";
@@ -78,38 +81,42 @@ trackElement.addEventListener("transitionend", (event) => {
     void trackElement.offsetWidth;
     trackElement.style.transition = "transform 1.1s ease-in-out";
   }
-});
-
-function goToSlide(index) {
-  logicalSlideIndex = index;
-  trackPositionIndex = index + 1;
-  progress = 0;
-  lastTimestamp = null;
-
-  setActiveDots();
-  updateSliderTransform(true);
-  updateProgressBars();
 }
 
-dots.forEach((dot) => {
-  dot.addEventListener("click", () => {
-    const index = Number(dot.dataset.index);
-    goToSlide(index);
+function handleDotClick(dot) {
+  const index = Number(dot.dataset.index);
+  goToSlide(index);
+}
+
+function handleDotKeydown(event, dot) {
+  const key = event.key;
+  if (key === "Enter" || key === " " || key === "Spacebar") {
+    event.preventDefault();
+    handleDotClick(dot);
+  }
+}
+
+function attachEvents() {
+  trackElement.addEventListener("transitionend", handleTransitionEnd);
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => handleDotClick(dot));
+    dot.addEventListener("keydown", (event) => handleDotKeydown(event, dot));
   });
-});
 
-playPauseButton.addEventListener("click", () => {
-  userPaused = !userPaused;
-  playPauseButton.textContent = userPaused ? "▶" : "❚❚";
-});
+  playPauseButton.addEventListener("click", () => {
+    userPaused = !userPaused;
+    playPauseButton.textContent = userPaused ? "▶" : "❚❚";
+  });
 
-sliderElement.addEventListener("mouseenter", () => {
-  hoverPaused = true;
-});
+  sliderElement.addEventListener("mouseenter", () => {
+    hoverPaused = true;
+  });
 
-sliderElement.addEventListener("mouseleave", () => {
-  hoverPaused = false;
-});
+  sliderElement.addEventListener("mouseleave", () => {
+    hoverPaused = false;
+  });
+}
 
 function animationLoop(timestamp) {
   if (lastTimestamp == null) {
@@ -119,19 +126,23 @@ function animationLoop(timestamp) {
   const deltaTime = timestamp - lastTimestamp;
   lastTimestamp = timestamp;
 
-  if (!isSliderPaused()) {
+  if (!isPaused()) {
     progress += deltaTime / SLIDE_DURATION;
-
     if (progress >= 1) {
       progress = 0;
       goToNextSlide();
     }
   }
 
-  updateProgressBars();
+  updateDotsAndBars();
   requestAnimationFrame(animationLoop);
 }
 
-setActiveDots();
-updateSliderTransform(false);
-requestAnimationFrame(animationLoop);
+function initSlider() {
+  updateDotsAndBars();
+  updateTransform(false);
+  attachEvents();
+  requestAnimationFrame(animationLoop);
+}
+
+initSlider();
