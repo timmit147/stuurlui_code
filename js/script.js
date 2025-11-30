@@ -71,6 +71,16 @@ function goToNextSlide() {
   updateTransform(true);
 }
 
+function goToPreviousSlide() {
+  trackPositionIndex -= 1;
+  logicalSlideIndex = (logicalSlideIndex - 1 + slideCount) % slideCount;
+  progress = 0;
+  lastTimestamp = null;
+
+  updateDotsAndBars();
+  updateTransform(true);
+}
+
 function handleTransitionEnd(event) {
   if (event.target !== trackElement || event.propertyName !== "transform") return;
 
@@ -81,18 +91,13 @@ function handleTransitionEnd(event) {
     void trackElement.offsetWidth;
     trackElement.style.transition = "transform 1.1s ease-in-out";
   }
-}
 
-function handleDotActivate(dot) {
-  const index = Number(dot.dataset.index);
-  goToSlide(index);
-}
-
-function handleDotKeydown(event, dot) {
-  const key = event.key;
-  if (key === "Enter" || key === " " || key === "Spacebar") {
-    event.preventDefault();
-    handleDotActivate(dot);
+  if (trackPositionIndex === 0) {
+    trackElement.style.transition = "none";
+    trackPositionIndex = slideCount;
+    trackElement.style.transform = `translateX(-${trackPositionIndex * 100}%)`;
+    void trackElement.offsetWidth;
+    trackElement.style.transition = "transform 1.1s ease-in-out";
   }
 }
 
@@ -100,11 +105,19 @@ function attachEvents() {
   trackElement.addEventListener("transitionend", handleTransitionEnd);
 
   dots.forEach((dot) => {
-    dot.addEventListener("click", () => handleDotActivate(dot));
+    dot.addEventListener("click", () => {
+      const index = Number(dot.dataset.index);
+      goToSlide(index);
+    });
 
-    dot.addEventListener("keydown", (event) => handleDotKeydown(event, dot));
-
-    dot.addEventListener("focus", () => handleDotActivate(dot));
+    dot.addEventListener("keydown", (event) => {
+      const key = event.key;
+      if (key === "Enter" || key === " " || key === "Spacebar") {
+        event.preventDefault();
+        const index = Number(dot.dataset.index);
+        goToSlide(index);
+      }
+    });
   });
 
   playPauseButton.addEventListener("click", () => {
@@ -118,6 +131,16 @@ function attachEvents() {
 
   sliderElement.addEventListener("mouseleave", () => {
     hoverPaused = false;
+  });
+
+  sliderElement.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goToNextSlide();
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goToPreviousSlide();
+    }
   });
 }
 
