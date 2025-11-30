@@ -83,7 +83,7 @@ function handleTransitionEnd(event) {
   }
 }
 
-function handleDotClick(dot) {
+function handleDotActivate(dot) {
   const index = Number(dot.dataset.index);
   goToSlide(index);
 }
@@ -92,7 +92,7 @@ function handleDotKeydown(event, dot) {
   const key = event.key;
   if (key === "Enter" || key === " " || key === "Spacebar") {
     event.preventDefault();
-    handleDotClick(dot);
+    handleDotActivate(dot);
   }
 }
 
@@ -100,8 +100,11 @@ function attachEvents() {
   trackElement.addEventListener("transitionend", handleTransitionEnd);
 
   dots.forEach((dot) => {
-    dot.addEventListener("click", () => handleDotClick(dot));
+    dot.addEventListener("click", () => handleDotActivate(dot));
+
     dot.addEventListener("keydown", (event) => handleDotKeydown(event, dot));
+
+    dot.addEventListener("focus", () => handleDotActivate(dot));
   });
 
   playPauseButton.addEventListener("click", () => {
