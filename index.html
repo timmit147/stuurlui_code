@@ -14,158 +14,169 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <section class="hero">
-      <div class="hero-left">
-        <h1 class="hero-title">
-          Stuurlui levert het<br />
-          allerbeste in<br />
-          WordPress
-        </h1>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-left">
+          <h1 class="hero-title" id="hero-title">
+            Stuurlui levert het<br />
+            allerbeste in<br />
+            WordPress
+          </h1>
 
-        <hr class="hero-divider" />
+          <hr class="hero-divider" />
 
-        <p class="hero-subtitle">
-          Met de ambitie om het meest klantvriendelijke WordPress bureau
-          van Nederland te zijn.
-        </p>
+          <p class="hero-subtitle">
+            Met de ambitie om het meest klantvriendelijke WordPress bureau
+            van Nederland te zijn.
+          </p>
 
-        <hr class="hero-divider" />
-      </div>
-
-      <div class="hero-right hero-slider" id="heroSlider">
-        <div class="slider-window">
-          <div class="slider-track" id="sliderTrack">
-            <article class="slider-card" data-index="0" data-case="nlziet">
-              <div class="card-surface">
-                <div class="slide-media">
-                  <img
-                    src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
-                    alt="Nieuwe website voor NLZIET"
-                    loading="lazy"
-                  />
-                </div>
-                <a
-                  href="https://stuurlui.nl/project/nieuwe-website-nlziet/"
-                  class="case-link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Bekijk case <span>→</span>
-                </a>
-              </div>
-            </article>
-
-            <article class="slider-card" data-index="1" data-case="action">
-              <div class="card-surface">
-                <div class="slide-media">
-                  <img
-                    src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
-                    alt="Company website voor Action"
-                    loading="lazy"
-                  />
-                </div>
-                <a
-                  href="https://stuurlui.nl/project/company-website-voor-de-action/"
-                  class="case-link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Bekijk case <span>→</span>
-                </a>
-              </div>
-            </article>
-
-            <article class="slider-card" data-index="2" data-case="heineken">
-              <div class="card-surface">
-                <div class="slide-media">
-                  <img
-                    src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
-                    alt="Heineken DT Space website"
-                    loading="lazy"
-                  />
-                </div>
-                <a
-                  href="https://stuurlui.nl/project/heineken-dt-space-website/"
-                  class="case-link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Bekijk case <span>→</span>
-                </a>
-              </div>
-            </article>
-
-            <article class="slider-card" data-index="3" data-case="hmc">
-              <div class="card-surface">
-                <div class="slide-media">
-                  <img
-                    src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
-                    alt="Corporate en werken-bij website voor Haaglanden Medisch Centrum"
-                    loading="lazy"
-                  />
-                </div>
-                <a
-                  href="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
-                  class="case-link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Bekijk case <span>→</span>
-                </a>
-              </div>
-            </article>
-
-            <article class="slider-card" data-index="4" data-case="lzv">
-              <div class="card-surface">
-                <div class="slide-media">
-                  <img
-                    src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
-                    alt="Website voor Landelijk Zorgsysteem voor Veteranen"
-                    loading="lazy"
-                  />
-                </div>
-                <a
-                  href="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
-                  class="case-link"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  Bekijk case <span>→</span>
-                </a>
-              </div>
-            </article>
-          </div>
+          <hr class="hero-divider" />
         </div>
 
-        <div class="slider-controls">
-          <button
-            class="slider-playpause"
-            id="sliderPlayPause"
-            aria-label="Pauzeer slider"
-          >
-            ❚❚
-          </button>
+        <section
+          class="hero-right hero-slider"
+          id="heroSlider"
+          aria-label="Uitgelichte cases"
+          role="group"
+          aria-roledescription="carousel"
+          tabindex="0"
+        >
+          <div class="slider-window" aria-live="off">
+            <div class="slider-track" id="sliderTrack">
+              <article class="slider-card" data-index="0" data-case="nlziet">
+                <div class="card-surface">
+                  <div class="slide-media">
+                    <img
+                      src="https://stuurlui.nl/wp-content/smush-webp/2024/03/NLZiet-1-375x375.png.webp"
+                      alt="Nieuwe website voor NLZIET"
+                      loading="lazy"
+                    />
+                  </div>
+                  <a
+                    href="https://stuurlui.nl/project/nieuwe-website-nlziet/"
+                    class="case-link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Bekijk case <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
 
-          <div class="slider-dots" id="sliderDots">
-            <div class="slider-dot active" data-index="0">
-              <div class="slider-dot-bar"></div>
-            </div>
-            <div class="slider-dot" data-index="1">
-              <div class="slider-dot-bar"></div>
-            </div>
-            <div class="slider-dot" data-index="2">
-              <div class="slider-dot-bar"></div>
-            </div>
-            <div class="slider-dot" data-index="3">
-              <div class="slider-dot-bar"></div>
-            </div>
-            <div class="slider-dot" data-index="4">
-              <div class="slider-dot-bar"></div>
+              <article class="slider-card" data-index="1" data-case="action">
+                <div class="card-surface">
+                  <div class="slide-media">
+                    <img
+                      src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Action-375x375.png.webp"
+                      alt="Company website voor Action"
+                      loading="lazy"
+                    />
+                  </div>
+                  <a
+                    href="https://stuurlui.nl/project/company-website-voor-de-action/"
+                    class="case-link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Bekijk case <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
+
+              <article class="slider-card" data-index="2" data-case="heineken">
+                <div class="card-surface">
+                  <div class="slide-media">
+                    <img
+                      src="https://stuurlui.nl/wp-content/smush-webp/2024/03/Heineken-375x375.png.webp"
+                      alt="Heineken DT Space website"
+                      loading="lazy"
+                    />
+                  </div>
+                  <a
+                    href="https://stuurlui.nl/project/heineken-dt-space-website/"
+                    class="case-link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Bekijk case <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
+
+              <article class="slider-card" data-index="3" data-case="hmc">
+                <div class="card-surface">
+                  <div class="slide-media">
+                    <img
+                      src="https://stuurlui.nl/wp-content/smush-webp/2024/03/HMC-375x375.png.webp"
+                      alt="Corporate en werken-bij website voor Haaglanden Medisch Centrum"
+                      loading="lazy"
+                    />
+                  </div>
+                  <a
+                    href="https://stuurlui.nl/project/nieuwe-corporate-en-werkenbij-website-voor-het-haaglanden-medisch-centrum/"
+                    class="case-link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Bekijk case <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
+
+              <article class="slider-card" data-index="4" data-case="lzv">
+                <div class="card-surface">
+                  <div class="slide-media">
+                    <img
+                      src="https://stuurlui.nl/wp-content/smush-webp/2025/06/LZV-4-600x600.png.webp"
+                      alt="Website voor Landelijk Zorgsysteem voor Veteranen"
+                      loading="lazy"
+                    />
+                  </div>
+                  <a
+                    href="https://stuurlui.nl/project/landelijk-zorgsysteem-voor-veteranen-website/"
+                    class="case-link"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Bekijk case <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
+
+          <div class="slider-controls">
+            <button
+              class="slider-playpause"
+              id="sliderPlayPause"
+              type="button"
+              aria-label="Pauzeer slider"
+              aria-pressed="false"
+            >
+              ❚❚
+            </button>
+
+            <div class="slider-dots" id="sliderDots">
+              <div class="slider-dot active" data-index="0">
+                <div class="slider-dot-bar"></div>
+              </div>
+              <div class="slider-dot" data-index="1">
+                <div class="slider-dot-bar"></div>
+              </div>
+              <div class="slider-dot" data-index="2">
+                <div class="slider-dot-bar"></div>
+              </div>
+              <div class="slider-dot" data-index="3">
+                <div class="slider-dot-bar"></div>
+              </div>
+              <div class="slider-dot" data-index="4">
+                <div class="slider-dot-bar"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
 
     <script src="js/script.js"></script>
   </body>

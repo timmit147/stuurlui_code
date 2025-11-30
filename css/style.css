@@ -4,6 +4,7 @@
   --text-body: #5f6a87;
   --accent-peach: #f6c58f;
   --dot-grey: #d4d9e4;
+
   --card-bg-1: #ffe1e4;
   --card-bg-2: #fff1df;
   --card-bg-3: #e8f0ff;
@@ -23,6 +24,12 @@ body {
   color: var(--brand-blue);
   overflow-x: hidden;
 }
+
+main {
+  min-height: 100vh;
+}
+
+/* HERO */
 
 .hero {
   max-width: 1440px;
@@ -67,11 +74,18 @@ body {
   margin: 0 0 32px;
 }
 
+/* SLIDER */
+
 .hero-slider {
   position: relative;
   width: 100%;
   max-width: 540px;
   margin-left: auto;
+}
+
+.hero-slider:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 4px;
 }
 
 .slider-window {
@@ -111,22 +125,20 @@ body {
 .slider-card[data-case="nlziet"] .card-surface {
   background: var(--card-bg-1);
 }
-
 .slider-card[data-case="action"] .card-surface {
   background: var(--card-bg-2);
 }
-
 .slider-card[data-case="heineken"] .card-surface {
   background: var(--card-bg-3);
 }
-
 .slider-card[data-case="hmc"] .card-surface {
   background: var(--card-bg-4);
 }
-
 .slider-card[data-case="lzv"] .card-surface {
   background: var(--card-bg-5);
 }
+
+/* NLZIET static effect */
 
 .slider-card[data-case="nlziet"] .card-surface::before {
   content: "";
@@ -210,6 +222,8 @@ body {
   color: #ffffff;
 }
 
+/* CONTROLS */
+
 .slider-controls {
   display: flex;
   align-items: center;
@@ -233,6 +247,11 @@ body {
   cursor: pointer;
   padding: 0;
   font-size: 18px;
+}
+
+.slider-playpause:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 3px;
 }
 
 .slider-dots {
@@ -267,6 +286,8 @@ body {
   width: 58px;
 }
 
+/* RESPONSIVE */
+
 @media (max-width: 1024px) {
   .hero {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -298,5 +319,17 @@ body {
 
   .hero-title {
     font-size: 34px;
+  }
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  .slider-track {
+    transition: none !important;
+  }
+
+  .slider-card[data-case="nlziet"] .card-surface:hover::before {
+    animation: none;
   }
 }
