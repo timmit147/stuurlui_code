@@ -29,15 +29,14 @@ class HeroSlider {
 
     this.pointerStartX = null;
     this.pointerActive = false;
-
     this.isAnimating = false;
 
     this.setupClones();
     this.attachEvents();
     this.updateDotsAndBars();
     this.updateTransform(false);
-    requestAnimationFrame(this.animationLoop.bind(this));
     this.updatePlayPauseVisual();
+    requestAnimationFrame(this.animationLoop.bind(this));
   }
 
   setupClones() {
@@ -212,6 +211,19 @@ class HeroSlider {
       this.handleTransitionEnd(e)
     );
 
+    // Whole slide clickable (including clones)
+    this.track.addEventListener("click", (event) => {
+      const card = event.target.closest(".slider-card");
+      if (!card) return;
+      const link = card.querySelector(".case-link");
+      if (!link) return;
+
+      // If you actually clicked the link, let the browser handle it
+      if (event.target.closest("a")) return;
+
+      link.click();
+    });
+
     this.dots.forEach((dot) => {
       dot.addEventListener("click", () => this.handleDotClick(dot));
     });
@@ -230,6 +242,7 @@ class HeroSlider {
       this.hoverPaused = false;
     });
 
+    // Arrow navigation when slider has focus
     this.root.addEventListener("keydown", (event) =>
       this.handleKeydown(event)
     );
