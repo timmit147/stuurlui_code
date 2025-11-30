@@ -12,9 +12,7 @@ class HeroSlider {
     );
     this.playPauseButton = document.getElementById("sliderPlayPause");
     this.sliderWindow = this.root.querySelector(".slider-window");
-    this.caseLinks = Array.from(
-      this.root.querySelectorAll(".case-link")
-    );
+    this.caseLinks = Array.from(this.root.querySelectorAll(".case-link"));
 
     // Make all "Bekijk case" links NOT tabbable
     this.caseLinks.forEach((link) => {
@@ -159,8 +157,6 @@ class HeroSlider {
 
   toggleUserPaused() {
     this.userPaused = !this.userPaused;
-    this.progress = 0;
-    this.lastTimestamp = null;
     this.updatePlayPauseVisual();
   }
 
