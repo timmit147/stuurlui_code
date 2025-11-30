@@ -249,11 +249,6 @@ main {
   font-size: 18px;
 }
 
-.slider-playpause:focus-visible {
-  outline: 2px solid var(--brand-blue);
-  outline-offset: 3px;
-}
-
 .slider-dots {
   display: flex;
   align-items: center;

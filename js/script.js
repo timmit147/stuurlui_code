@@ -12,6 +12,14 @@ class HeroSlider {
     );
     this.playPauseButton = document.getElementById("sliderPlayPause");
     this.sliderWindow = this.root.querySelector(".slider-window");
+    this.caseLinks = Array.from(
+      this.root.querySelectorAll(".case-link")
+    );
+
+    // Make all "Bekijk case" links NOT tabbable
+    this.caseLinks.forEach((link) => {
+      link.tabIndex = -1;
+    });
 
     this.slideCount = this.slides.length;
 
